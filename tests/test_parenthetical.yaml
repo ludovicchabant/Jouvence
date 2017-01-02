@@ -1,0 +1,10 @@
+---
+in: |
+
+    STEEL
+    (starting the engine)
+    So much for retirement!
+out: 
+    - '@STEEL'
+    - '_(starting the engine)'
+    - '=So much for retirement!'

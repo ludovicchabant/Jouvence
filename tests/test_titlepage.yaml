@@ -1,0 +1,37 @@
+---
+in: ""
+title: {}
+out: []
+---
+in: "\n"
+title: {}
+out:
+    - "!\n"
+---
+in: "\n\n"
+title: {}
+out:
+    - "!\n\n"
+---
+in: "\n\n\n"
+title: {}
+out:
+    - "!\n\n\n"
+---
+in: |
+    Title: This simple test
+    Author: Ludovic
+title:
+    Title: "This simple test"
+    Author: "Ludovic"
+out: []
+---
+in: |
+    Title: This simple test
+
+    It doesn't have much.
+title:
+    Title: "This simple test"
+out:
+    - "!It doesn't have much.\n"
+

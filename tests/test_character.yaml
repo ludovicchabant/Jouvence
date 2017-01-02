@@ -1,0 +1,20 @@
+---
+in: "\nSTEEL\nThe man's a myth!"
+out:
+    - '@STEEL'
+    - "=The man's a myth!"
+---
+in: "\nMOM (O. S.)\nLuke! Come down for supper!"
+out:
+    - '@MOM (O. S.)'
+    - "=Luke! Come down for supper!"
+---
+in: "\nHANS (on the radio)\nWhat was it you said?"
+out:
+    - '@HANS (on the radio)'
+    - "=What was it you said?"
+---
+in: "\n@McCLANE\nYippie ki-yay!"
+out:
+    - '@McCLANE'
+    - "=Yippie ki-yay!"

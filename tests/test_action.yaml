@@ -1,0 +1,16 @@
+---
+in: "This is a simple action."
+out: 
+    - "!This is a simple action."
+---
+in: "This is a multi\nline\naction."
+out:
+    - "!This is a multi\nline\naction."
+---
+in: "This is a multi\n\nparagraph\n\n\naction."
+out: 
+    - "!This is a multi\n\nparagraph\n\n\naction."
+---
+in: "!EXT. ACTION. FORCED."
+out: 
+    - "!EXT. ACTION. FORCED."
