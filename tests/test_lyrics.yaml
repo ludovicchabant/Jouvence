@@ -1,0 +1,10 @@
+---
+in: "~Willy Wonka! Willy Wonka! The amazing chocolatier!"
+out:
+    - "~Willy Wonka! Willy Wonka! The amazing chocolatier!"
+---
+in: |
+    ~This is lyrics
+    But this is not
+out:
+    - "!~This is lyrics\nBut this is not"

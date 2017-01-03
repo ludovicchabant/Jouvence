@@ -1,0 +1,49 @@
+---
+in: |
+    The General Lee flies through the air. FREEZE FRAME.
+
+    NARRATOR
+    Shoot, to the Dukes that's about like taking Grandma for a Sunday drive.
+
+    >**End of Act One**<
+
+    ===
+
+    >**Act Two**<
+
+    The General Lee hangs in the air, right where we left it.
+out:
+    - "!The General Lee flies through the air. FREEZE FRAME."
+    - "@NARRATOR"
+    - "=Shoot, to the Dukes that's about like taking Grandma for a Sunday drive."
+    - "!><**End of Act One**"
+    - "<pagebreak>"
+    - "!><**Act Two**"
+    - "!The General Lee hangs in the air, right where we left it."
+---
+in: |
+    EXT. BRICK'S POOL - DAY
+
+    Steel, in the middle of a heated phone call:
+
+    STEEL
+    They're coming out of the woodwork!
+    (pause)
+    No, everybody we've put away!
+    (pause)
+    Point Blank Sniper?
+
+    .SNIPER SCOPE POV
+
+    From what seems like only INCHES AWAY.  _Steel's face FILLS the *Leupold Mark 4* scope_.
+out:
+    - ".EXT. BRICK'S POOL - DAY"
+    - "!Steel, in the middle of a heated phone call:"
+    - "@STEEL"
+    - "=They're coming out of the woodwork!"
+    - "_(pause)"
+    - "=No, everybody we've put away!"
+    - "_(pause)"
+    - "=Point Blank Sniper?"
+    - ".SNIPER SCOPE POV"
+    - "!From what seems like only INCHES AWAY.  _Steel's face FILLS the *Leupold Mark 4* scope_."

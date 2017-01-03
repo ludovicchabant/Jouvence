@@ -6,17 +6,17 @@ out: []
 in: "\n"
 title: {}
 out:
-    - "!\n"
+    - "!"
 ---
 in: "\n\n"
 title: {}
 out:
-    - "!\n\n"
+    - "!\n"
 ---
 in: "\n\n\n"
 title: {}
 out:
-    - "!\n\n\n"
+    - "!\n\n"
 ---
 in: |
     Title: This simple test
@@ -33,5 +33,5 @@ in: |
 title:
     Title: "This simple test"
 out:
-    - "!It doesn't have much.\n"
+    - "!It doesn't have much."
 

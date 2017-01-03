@@ -1,5 +1,5 @@
 ---
-in: "\nSTEEL\nThe man's a myth!"
+in: "STEEL\nThe man's a myth!"
 out:
     - '@STEEL'
     - "=The man's a myth!"
@@ -14,7 +14,7 @@ out:
     - '@HANS (on the radio)'
     - "=What was it you said?"
 ---
-in: "\n@McCLANE\nYippie ki-yay!"
+in: "@McCLANE\nYippie ki-yay!"
 out:
     - '@McCLANE'
     - "=Yippie ki-yay!"

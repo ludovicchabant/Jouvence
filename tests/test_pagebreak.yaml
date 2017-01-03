@@ -1,0 +1,16 @@
+---
+in: |
+    Here is some action.
+
+    NARRATOR
+    A page break is coming.
+
+    ===
+
+    There it was.
+out:
+    - "!Here is some action."
+    - "@NARRATOR"
+    - "=A page break is coming."
+    - "<pagebreak>"
+    - "!There it was."

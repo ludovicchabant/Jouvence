@@ -1,0 +1,16 @@
+---
+in: |
+    SANBORN
+    A good ole boy.
+out:
+    - "@SANBORN"
+    - "=A good ole boy."
+---
+in: |
+    DAN
+    Then let's retire them.
+    _Permanently_.
+out:
+    - "@DAN"
+    - "=Then let's retire them.\n_Permanently_."
+    

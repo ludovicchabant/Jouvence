@@ -46,14 +46,18 @@ class FontaineScene:
                                    'TYPE_%s' % add_type_name.upper())
 
                 def _type_adder(_text):
-                    self.paragraphs.append(
-                        FontaineSceneElement(add_type, _text))
+                    new_p = FontaineSceneElement(add_type, _text)
+                    self.paragraphs.append(new_p)
+                    return new_p
 
                 adder = _type_adder
                 self._adders[add_type_name] = adder
             return adder
         else:
             raise AttributeError
+
+    def addPageBreak(self):
+        self.paragraphs.append(FontaineSceneElement(TYPE_PAGEBREAK, None))
 
     def lastParagraph(self):
         try:
@@ -74,20 +78,32 @@ class FontaineSceneElement:
 
 
 TYPE_ACTION = 0
-TYPE_CHARACTER = 1
-TYPE_DIALOG = 2
-TYPE_PARENTHETICAL = 3
+TYPE_CENTEREDACTION = 1
+TYPE_CHARACTER = 2
+TYPE_DIALOG = 3
+TYPE_PARENTHETICAL = 4
+TYPE_TRANSITION = 5
+TYPE_LYRICS = 6
+TYPE_PAGEBREAK = 7
 
 
 def _scene_element_type_str(t):
     if t == TYPE_ACTION:
         return 'ACTION'
+    if t == TYPE_CENTEREDACTION:
+        return 'CENTEREDACTION'
     if t == TYPE_CHARACTER:
         return 'CHARACTER'
     if t == TYPE_DIALOG:
         return 'DIALOG'
     if t == TYPE_PARENTHETICAL:
         return 'PARENTHETICAL'
+    if t == TYPE_TRANSITION:
+        return 'TRANSITION'
+    if t == TYPE_LYRICS:
+        return 'LYRICS'
+    if t == TYPE_PAGEBREAK:
+        return 'PAGEBREAK'
     raise NotImplementedError()
 
 

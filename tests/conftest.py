@@ -4,8 +4,11 @@ import yaml
 import pytest
 from fontaine.document import (
     FontaineSceneElement,
-    TYPE_ACTION, TYPE_CHARACTER, TYPE_DIALOG, TYPE_PARENTHETICAL)
+    TYPE_ACTION, TYPE_CENTEREDACTION, TYPE_CHARACTER, TYPE_DIALOG,
+    TYPE_PARENTHETICAL, TYPE_TRANSITION, TYPE_LYRICS, TYPE_PAGEBREAK,
+    _scene_element_type_str)
 from fontaine.parser import FontaineParser, FontaineParserError
+from fontaine.renderer import BaseRenderer
 
 
 def pytest_addoption(parser):
@@ -67,6 +70,20 @@ def _d(text):
     return FontaineSceneElement(TYPE_DIALOG, text)
 
 
+def _t(text):
+    return FontaineSceneElement(TYPE_TRANSITION, text)
+
+
+def _l(text):
+    return FontaineSceneElement(TYPE_LYRICS, text)
+
+
+class UnexpectedScriptOutput(Exception):
+    def __init__(self, actual, expected):
+        self.actual = actual
+        self.expected = expected
+
+
 class FontaineScriptTestFile(pytest.File):
     def collect(self):
         spec = yaml.load_all(self.fspath.open(encoding='utf8'))
@@ -96,13 +113,44 @@ class FontaineScriptTestItem(pytest.Item):
         doc = parser.parseString(intext)
         if title is not None:
             assert title == doc.title_values
-        assert_scenes(doc.scenes, make_scenes(expected))
+
+        exp_scenes = make_scenes(expected)
+        try:
+            assert_scenes(doc.scenes, exp_scenes)
+        except AssertionError:
+            raise UnexpectedScriptOutput(doc.scenes, exp_scenes)
 
     def repr_failure(self, excinfo):
         if isinstance(excinfo.value, FontaineParserError):
             return ('\n'.join(
                 ['Parser error:', str(excinfo.value)]))
+        if isinstance(excinfo.value, UnexpectedScriptOutput):
+            return ('\n'.join(
+                ['Unexpected output:'] +
+                ['', 'Actual:'] +
+                list(_repr_doc_scenes(excinfo.value.actual)) +
+                ['', 'Expected:'] +
+                list(_repr_expected_scenes(excinfo.value.expected))))
         return super().repr_failure(excinfo)
+
+
+def _repr_doc_scenes(scenes):
+    for s in scenes:
+        yield 'Scene: "%s"' % s.header
+        for p in s.paragraphs:
+            yield '  %s: "%s"' % (_scene_element_type_str(p.type),
+                                  p.text)
+
+
+def _repr_expected_scenes(scenes):
+    for s in scenes:
+        yield 'Scene: "%s"' % s[0]
+        for p in s[1:]:
+            if isinstance(p, str):
+                yield '  ACTION: "%s"' % p
+            else:
+                yield '  %s: "%s"' % (_scene_element_type_str(p.type),
+                                      p.text)
 
 
 def make_scenes(spec):
@@ -114,21 +162,45 @@ def make_scenes(spec):
     cur_paras = []
 
     for item in spec:
+        if item == '<pagebreak>':
+            cur_paras.append(FontaineSceneElement(TYPE_PAGEBREAK, None))
+            continue
+
         token = item[:1]
         if token == '.':
             if cur_header or cur_paras:
                 out.append([cur_header] + cur_paras)
             cur_header = item[1:]
+            cur_paras = []
         elif token == '!':
-            cur_paras.append(item[1:])
+            if item[1:3] == '><':
+                cur_paras.append(
+                    FontaineSceneElement(TYPE_CENTEREDACTION, item[3:]))
+            else:
+                cur_paras.append(item[1:])
         elif token == '@':
             cur_paras.append(_c(item[1:]))
         elif token == '=':
             cur_paras.append(_d(item[1:]))
         elif token == '_':
             cur_paras.append(_p(item[1:]))
+        elif token == '>':
+            cur_paras.append(_t(item[1:]))
+        elif token == '~':
+            cur_paras.append(_l(item[1:]))
         else:
             raise Exception("Unknown token: %s" % token)
     if cur_header or cur_paras:
         out.append([cur_header] + cur_paras)
     return out
+
+
+class TestRenderer(BaseRenderer):
+    def write_bold(self, text):
+        pass
+
+    def write_italics(self, text):
+        pass
+
+    def write_underline(self, text):
+        pass
