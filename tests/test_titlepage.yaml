@@ -22,8 +22,8 @@ in: |
     Title: This simple test
     Author: Ludovic
 title:
-    Title: "This simple test"
-    Author: "Ludovic"
+    title: "This simple test"
+    author: "Ludovic"
 out: []
 ---
 in: |
@@ -31,7 +31,18 @@ in: |
 
     It doesn't have much.
 title:
-    Title: "This simple test"
+    title: "This simple test"
 out:
-    - "!It doesn't have much."
-
+    - "!\nIt doesn't have much."
+---
+in: |
+    Title:
+        _**BRICK & STEEL**_
+        _**FULL RETIRED**_
+    Credit: Written by
+    Authors: Stu Maschwitz
+title:
+    title: "_**BRICK & STEEL**_\n_**FULL RETIRED**_"
+    credit: Written by
+    authors: Stu Maschwitz
+out: []

@@ -85,6 +85,7 @@ TYPE_PARENTHETICAL = 4
 TYPE_TRANSITION = 5
 TYPE_LYRICS = 6
 TYPE_PAGEBREAK = 7
+TYPE_EMPTYLINES = 8
 
 
 def _scene_element_type_str(t):
@@ -104,6 +105,8 @@ def _scene_element_type_str(t):
         return 'LYRICS'
     if t == TYPE_PAGEBREAK:
         return 'PAGEBREAK'
+    if t == TYPE_EMPTYLINES:
+        return 'EMPTYLINES'
     raise NotImplementedError()
 
 

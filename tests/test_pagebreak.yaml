@@ -13,4 +13,4 @@ out:
     - "@NARRATOR"
     - "=A page break is coming."
     - "<pagebreak>"
-    - "!There it was."
+    - "!\nThere it was."

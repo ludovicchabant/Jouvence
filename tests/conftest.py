@@ -1,3 +1,4 @@
+import re
 import sys
 import logging
 import yaml
@@ -6,9 +7,9 @@ from fontaine.document import (
     FontaineSceneElement,
     TYPE_ACTION, TYPE_CENTEREDACTION, TYPE_CHARACTER, TYPE_DIALOG,
     TYPE_PARENTHETICAL, TYPE_TRANSITION, TYPE_LYRICS, TYPE_PAGEBREAK,
+    TYPE_EMPTYLINES,
     _scene_element_type_str)
 from fontaine.parser import FontaineParser, FontaineParserError
-from fontaine.renderer import BaseRenderer
 
 
 def pytest_addoption(parser):
@@ -153,6 +154,9 @@ def _repr_expected_scenes(scenes):
                                       p.text)
 
 
+RE_BLANK_LINE = re.compile(r"^\s+$")
+
+
 def make_scenes(spec):
     if not isinstance(spec, list):
         raise Exception("Script specs must be lists.")
@@ -164,6 +168,11 @@ def make_scenes(spec):
     for item in spec:
         if item == '<pagebreak>':
             cur_paras.append(FontaineSceneElement(TYPE_PAGEBREAK, None))
+            continue
+
+        if RE_BLANK_LINE.match(item):
+            text = len(item) * '\n'
+            cur_paras.append(FontaineSceneElement(TYPE_EMPTYLINES, text))
             continue
 
         token = item[:1]
@@ -193,14 +202,3 @@ def make_scenes(spec):
     if cur_header or cur_paras:
         out.append([cur_header] + cur_paras)
     return out
-
-
-class TestRenderer(BaseRenderer):
-    def write_bold(self, text):
-        pass
-
-    def write_italics(self, text):
-        pass
-
-    def write_underline(self, text):
-        pass

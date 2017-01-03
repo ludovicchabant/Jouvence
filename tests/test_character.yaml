@@ -18,3 +18,13 @@ in: "@McCLANE\nYippie ki-yay!"
 out:
     - '@McCLANE'
     - "=Yippie ki-yay!"
+---
+in: "DR. BENNET\nHere's your medication."
+out:
+    - '@DR. BENNET'
+    - "=Here's your medication."
+---
+in: "CROWD (VARIOUS)\nWe want free t-shirts!"
+out:
+    - "@CROWD (VARIOUS)"
+    - "=We want free t-shirts!"

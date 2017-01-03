@@ -19,7 +19,7 @@ out:
     - "!><**End of Act One**"
     - "<pagebreak>"
     - "!><**Act Two**"
-    - "!The General Lee hangs in the air, right where we left it."
+    - "!\nThe General Lee hangs in the air, right where we left it."
 ---
 in: |
     EXT. BRICK'S POOL - DAY
@@ -38,7 +38,7 @@ in: |
     From what seems like only INCHES AWAY.  _Steel's face FILLS the *Leupold Mark 4* scope_.
 out:
     - ".EXT. BRICK'S POOL - DAY"
-    - "!Steel, in the middle of a heated phone call:"
+    - "!\nSteel, in the middle of a heated phone call:"
     - "@STEEL"
     - "=They're coming out of the woodwork!"
     - "_(pause)"
@@ -46,4 +46,18 @@ out:
     - "_(pause)"
     - "=Point Blank Sniper?"
     - ".SNIPER SCOPE POV"
-    - "!From what seems like only INCHES AWAY.  _Steel's face FILLS the *Leupold Mark 4* scope_."
+    - "!\nFrom what seems like only INCHES AWAY.  _Steel's face FILLS the *Leupold Mark 4* scope_."
+---
+in: |
+    Title: Something for Testing
+    Author: Moi
+
+    EXT. ANOTHER PLACE
+
+    This is an action I think.
+title:
+    title: Something for Testing
+    author: Moi
+out:
+    - ".EXT. ANOTHER PLACE"
+    - "!\nThis is an action I think."

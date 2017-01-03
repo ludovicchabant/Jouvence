@@ -14,3 +14,44 @@ out:
 in: "!EXT. ACTION. FORCED."
 out: 
     - "!EXT. ACTION. FORCED."
+---
+in: |
+    JOHN
+    This is my dialogue.
+
+    JAKE
+    There were blanks before mine.
+out:
+    - "@JOHN"
+    - "=This is my dialogue."
+    - "@JAKE"
+    - "=There were blanks before mine."
+---
+in: |
+    JOHN
+    This is my dialogue.
+
+
+    JAKE
+    There were blanks before mine.
+out:
+    - "@JOHN"
+    - "=This is my dialogue."
+    - "!"
+    - "@JAKE"
+    - "=There were blanks before mine."
+---
+in: |
+    JOHN
+    This is my dialogue.
+
+
+
+    JAKE
+    There were blanks before mine.
+out:
+    - "@JOHN"
+    - "=This is my dialogue."
+    - "!\n"
+    - "@JAKE"
+    - "=There were blanks before mine."

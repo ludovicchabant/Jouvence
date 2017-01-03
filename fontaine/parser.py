@@ -1,16 +1,14 @@
 import re
 import logging
+from .document import TYPE_ACTION
 
 
 logger = logging.getLogger(__name__)
 
 
 class FontaineState:
-    can_merge = False
-    needs_pending_empty_lines = True
-
     def __init__(self):
-        self.has_pending_empty_line = False
+        pass
 
     def match(self, fp, ctx):
         return False
@@ -18,10 +16,7 @@ class FontaineState:
     def consume(self, fp, ctx):
         raise NotImplementedError()
 
-    def merge(self):
-        pass
-
-    def exit(self, ctx):
+    def exit(self, ctx, next_state):
         pass
 
 
@@ -42,7 +37,7 @@ EOF_STATE = object()
 RE_EMPTY_LINE = re.compile(r"^$", re.M)
 RE_BLANK_LINE = re.compile(r"^\s*$", re.M)
 
-RE_TITLE_KEY_VALUE = re.compile(r"^(?P<key>[\w\s\-]+)\s*:")
+RE_TITLE_KEY_VALUE = re.compile(r"^(?P<key>[\w\s\-]+)\s*:\s*")
 
 
 class _TitlePageState(FontaineState):
@@ -65,27 +60,27 @@ class _TitlePageState(FontaineState):
             if m:
                 # Commit current value, start new one.
                 self._commit(ctx)
-                self._cur_key = m.group('key')
-                self._cur_val = line[m.end():].strip()
+                self._cur_key = m.group('key').lower()
+                self._cur_val = line[m.end():]
             else:
                 # Keep accumulating the value of one of the title page's
                 # values.
-                self._cur_val += line.strip()
+                self._cur_val += line.lstrip()
 
             if RE_EMPTY_LINE.match(fp.peekline()):
                 self._commit(ctx)
                 # Finished with the page title, now move on to the first scene.
-                self.has_pending_empty_line = True
                 break
 
         return ANY_STATE
 
-    def exit(self, ctx):
+    def exit(self, ctx, next_state):
         self._commit(ctx)
 
     def _commit(self, ctx):
         if self._cur_key is not None:
-            ctx.document.title_values[self._cur_key] = self._cur_val
+            val = self._cur_val.rstrip('\r\n')
+            ctx.document.title_values[self._cur_key] = val
             self._cur_key = None
             self._cur_val = None
 
@@ -107,19 +102,13 @@ class _SceneHeaderState(FontaineState):
         line = fp.readline().rstrip('\r\n')
         line = line.lstrip('.')  # In case it was forced.
         ctx.document.addScene(line)
-        self.has_pending_empty_line = True
         return ANY_STATE
 
 
 class _ActionState(FontaineState):
-    can_merge = True
-    needs_pending_empty_lines = False
-
     def __init__(self):
         super().__init__()
         self.text = ''
-        self._to_merge = None
-        self._was_merged = False
 
     def match(self, fp, ctx):
         return True
@@ -132,6 +121,10 @@ class _ActionState(FontaineState):
                 return EOF_STATE
 
             if is_first_line:
+                # Ignore the fake blank line at 0 if it's threre.
+                if fp.line_no == 0:
+                    continue
+
                 line = line.lstrip('!')  # In case it was forced.
                 is_first_line = False
 
@@ -139,23 +132,19 @@ class _ActionState(FontaineState):
             # the line we just got because it's probably gonna be the
             # last one.
             if RE_EMPTY_LINE.match(fp.peekline()):
-                stripped_line = line.rstrip("\r\n")
-                self.text += stripped_line
-                self._to_merge = line[len(stripped_line):]
+                self.text += line.rstrip("\r\n")
                 break
             # ...otherwise, add the line with in full.
             self.text += line
 
         return ANY_STATE
 
-    def merge(self):
-        # Put back the stuff we stripped from what we thought was the
-        # last line.
-        self.text += self._to_merge
-        self._was_merged = True
-
-    def exit(self, ctx):
-        ctx.document.lastScene().addAction(self.text)
+    def exit(self, ctx, next_state):
+        last_para = ctx.document.lastParagraph()
+        if last_para and last_para.type == TYPE_ACTION:
+            last_para.text += '\n' + self.text
+        else:
+            ctx.document.lastScene().addAction(self.text)
 
 
 RE_CENTERED_LINE = re.compile(r"^\s*>\s*.*\s*<\s*$", re.M)
@@ -190,7 +179,6 @@ class _CenteredActionState(FontaineState):
                 # if we detect a line that doesn't have them, we make this
                 # paragraph be a normal action instead.
                 fp.restore(snapshot)
-                self.has_pending_empty_line = True
                 self._aborted = True
                 return _ActionState()
             else:
@@ -199,18 +187,17 @@ class _CenteredActionState(FontaineState):
 
             if RE_EMPTY_LINE.match(fp.peekline()):
                 self.text += clean_line
-                self.has_pending_empty_line = True
                 break
             self.text += clean_line + eol
 
         return ANY_STATE
 
-    def exit(self, ctx):
+    def exit(self, ctx, next_state):
         if not self._aborted:
             ctx.document.lastScene().addCenteredAction(self.text)
 
 
-RE_CHARACTER_LINE = re.compile(r"^\s*[A-Z\-]+\s*(\(.*\))?$", re.M)
+RE_CHARACTER_LINE = re.compile(r"^\s*[A-Z][A-Z\-\._\s]+\s*(\(.*\))?$", re.M)
 
 
 class _CharacterState(FontaineState):
@@ -247,7 +234,6 @@ class _ParentheticalState(FontaineState):
         if not RE_EMPTY_LINE.match(next_line):
             return _DialogState()
 
-        self.has_pending_empty_line = True
         return ANY_STATE
 
 
@@ -280,13 +266,12 @@ class _DialogState(FontaineState):
 
             if RE_EMPTY_LINE.match(next_line):
                 self.text += line.rstrip('\r\n')
-                self.has_pending_empty_line = True
                 break
             self.text += line
 
         return ANY_STATE
 
-    def exit(self, ctx):
+    def exit(self, ctx, next_state):
         ctx.document.lastScene().addDialog(self.text.rstrip('\r\n'))
 
 
@@ -312,19 +297,17 @@ class _LyricsState(FontaineState):
             else:
                 logger.debug("Rolling back lyrics into action paragraph.")
                 fp.restore(snapshot)
-                self.has_pending_empty_line = True
                 self._aborted = True
                 return _ActionState()
 
             if RE_EMPTY_LINE.match(fp.peekline()):
                 self.text += line.rstrip('\r\n')
-                self.has_pending_empty_line = True
                 break
             self.text += line
 
         return ANY_STATE
 
-    def exit(self, ctx):
+    def exit(self, ctx, next_state):
         if not self._aborted:
             ctx.document.lastScene().addLyrics(self.text)
 
@@ -345,7 +328,7 @@ class _TransitionState(FontaineState):
         line = fp.readline().lstrip().rstrip('\r\n')
         line = line.lstrip('>')  # In case it was forced.
         ctx.document.lastScene().addTransition(line)
-        self.has_pending_empty_line = True
+        return ANY_STATE
 
 
 RE_PAGE_BREAK_LINE = re.compile(r"^\=\=\=+$", re.M)
@@ -363,7 +346,6 @@ class _PageBreakState(FontaineState):
         fp.readline()
         fp.readline()
         ctx.document.lastScene().addPageBreak()
-        self.has_pending_empty_line = True
         return ANY_STATE
 
 
@@ -407,6 +389,30 @@ class _ForcedParagraphStates(FontaineState):
         return self._state_cls()
 
 
+class _EmptyLineState(FontaineState):
+    def __init__(self):
+        super().__init__()
+        self.line_count = 0
+
+    def match(self, fp, ctx):
+        return RE_EMPTY_LINE.match(fp.peekline())
+
+    def consume(self, fp, ctx):
+        fp.readline()
+        if fp.line_no > 1:  # Don't take into account the fake blank at 0
+            self.line_count += 1
+        return ANY_STATE
+
+    def exit(self, ctx, next_state):
+        if self.line_count > 0:
+            text = self.line_count * '\n'
+            last_para = ctx.document.lastParagraph()
+            if last_para and last_para.type == TYPE_ACTION:
+                last_para.text += text
+            else:
+                ctx.document.lastScene().addAction(text[1:])
+
+
 ROOT_STATES = [
     _ForcedParagraphStates,  # Must be first.
     _SceneHeaderState,
@@ -414,6 +420,7 @@ ROOT_STATES = [
     _TransitionState,
     _PageBreakState,
     _CenteredActionState,
+    _EmptyLineState,   # Must be second to last.
     _ActionState,  # Must be last.
 ]
 
@@ -424,12 +431,13 @@ class _PeekableFile:
         self._fp = fp
         self._blankAt0 = False
 
-    def readline(self, size=-1):
+    def readline(self):
         if self._blankAt0:
             self._blankAt0 = False
+            self.line_no = 0
             return '\n'
 
-        data = self._fp.readline(size)
+        data = self._fp.readline()
         self.line_no += 1
         return data
 
@@ -466,12 +474,7 @@ class _PeekableFile:
             raise Exception(
                 "Can't add blank line at 0 if reading has started.")
         self._blankAt0 = True
-
-    def _read(self, size, advance_line_no):
-        data = self._fp.read(size)
-        if advance_line_no:
-            self.line_no += data.count('\n')
-        return data
+        self.line_no = 0
 
 
 class _FontaineStateMachine:
@@ -497,9 +500,6 @@ class _FontaineStateMachine:
                 # Add a fake empty line at the beginning of the text if
                 # there's not one already. This makes state matching easier.
                 self.fp._addBlankAt0()
-                # Make this added empty line "pending" so if the first line
-                # is an action paragraph, it doesn't include it.
-                self.state.has_pending_empty_line = True
 
         # Start parsing! Here we try to do a mostly-forward-only parser with
         # non overlapping regexes to make it decently fast.
@@ -516,10 +516,12 @@ class _FontaineStateMachine:
             # Figure out what to do next...
 
             if res is None:
-                raise Exception(
+                raise FontaineParserError(
+                    self.line_no,
+                    "State '%s' returned a `None` result. "
                     "States need to return `ANY_STATE`, one or more specific "
                     "states, or `EOF_STATE` if they reached the end of the "
-                    "file.")
+                    "file." % self.state.__class__.__name__)
 
             elif res is ANY_STATE or isinstance(res, list):
                 # State wants to exit, we need to figure out what is the
@@ -544,36 +546,19 @@ class _FontaineStateMachine:
 
                 # Handle the current state before we move on to the new one.
                 if self.state:
-                    if type(self.state) == type(res) and self.state.can_merge:
-                        # Don't switch states if the next state is the same
-                        # type and that type supports merging.
-                        self.state.merge()
-                        continue
-
-                    self.state.exit(self)
-                    if (self.state.has_pending_empty_line and
-                            not res.needs_pending_empty_lines):
-                        logger.debug("Skipping pending blank line from %s" %
-                                     self.state.__class__.__name__)
-                        self.fp.readline()
-
+                    self.state.exit(self, res)
                 self.state = res
 
             elif isinstance(res, FontaineState):
                 # State wants to exit, wants a specific state to be next.
                 if self.state:
-                    self.state.exit(self)
-                    if (self.state.has_pending_empty_line and
-                            not res.needs_pending_empty_lines):
-                        logger.debug("Skipping pending blank line from %s" %
-                                     self.state.__class__.__name__)
-                        self.fp.readline()
+                    self.state.exit(self, res)
                 self.state = res
 
             elif res is EOF_STATE:
                 # Reached end of file.
                 if self.state:
-                    self.state.exit(self)
+                    self.state.exit(self, res)
                 break
 
             else:
