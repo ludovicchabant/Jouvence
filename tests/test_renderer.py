@@ -1,15 +1,15 @@
 import pytest
-from fontaine.renderer import BaseRenderer
+from fontaine.renderer import BaseTextRenderer
 
 
-class TestRenderer(BaseRenderer):
-    def write_bold(self, text):
+class TestTextRenderer(BaseTextRenderer):
+    def make_bold(self, text):
         return 'B:' + text + ':B'
 
-    def write_italics(self, text):
+    def make_italics(self, text):
         return 'I:' + text + ':I'
 
-    def write_underline(self, text):
+    def make_underline(self, text):
         return 'U:' + text + ':U'
 
 
@@ -25,7 +25,7 @@ class TestRenderer(BaseRenderer):
     ("This is an \_escaped_ one.", "This is an _escaped_ one.")
 ])
 def test_underline(intext, expected):
-    r = TestRenderer()
+    r = TestTextRenderer()
     out = r.render_text(intext)
     assert out == expected
 
@@ -42,7 +42,7 @@ def test_underline(intext, expected):
     ("This is some \*escaped* one.", "This is some *escaped* one.")
 ])
 def test_italics(intext, expected):
-    r = TestRenderer()
+    r = TestTextRenderer()
     out = r.render_text(intext)
     assert out == expected
 
@@ -59,6 +59,6 @@ def test_italics(intext, expected):
     ("This is some \**escaped** one.", "This is some **escaped** one.")
 ])
 def test_bold(intext, expected):
-    r = TestRenderer()
+    r = TestTextRenderer()
     out = r.render_text(intext)
     assert out == expected
