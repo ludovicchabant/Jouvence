@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+import os.path
+import sys
+import argparse
+
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Fontaine command line utility')
+    parser.add_argument('script')
+    args = parser.parse_args()
+
+    from fontaine.parser import FontaineParser
+    from fontaine.console import ConsoleDocumentRenderer
+    p = FontaineParser()
+    doc = p.parse(args.script)
+    rdr = ConsoleDocumentRenderer()
+    rdr.render_doc(doc)
+
+
+if __name__ == '__main__':
+    main()
