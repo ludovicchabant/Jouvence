@@ -47,8 +47,9 @@ The Jouvence API goes pretty much like this::
   parser = JouvenceParser()
   document = parser.parse(path_to_file)
   renderer = HtmlDocumentRenderer()
-  markup = renderer.render_doc(document)
-  return markup
+  with open(path_to_output, 'w') as fp:
+    renderer.render_doc(document, fp)
+
 
 
 Limitations
