@@ -7,5 +7,5 @@ venv
 *.css.map
 *.pyc
 
-Fontaine.egg-info
-fontaine/version.py
+Jouvence.egg-info
+jouvence/version.py
