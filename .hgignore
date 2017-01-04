@@ -2,6 +2,10 @@ syntax:glob
 __pycache__
 venv
 .cache
+.eggs
 .sass-cache
 *.css.map
 *.pyc
+
+Fontaine.egg-info
+fontaine/version.py
