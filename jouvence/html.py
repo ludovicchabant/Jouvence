@@ -7,7 +7,7 @@ def _elem(out, elem_name, class_name, contents):
     f = out.write
     f('<%s' % elem_name)
     if class_name:
-        f(' class="fontaine-%s"' % class_name)
+        f(' class="jouvence-%s"' % class_name)
     f('>')
     f(contents)
     f('</%s>\n' % elem_name)
@@ -44,7 +44,7 @@ class HtmlDocumentRenderer(BaseDocumentRenderer):
                 'css': self.get_css()
             }
             out.write(_res('html_header.html') % data)
-        out.write('<div class="fontaine-doc">\n')
+        out.write('<div class="jouvence-doc">\n')
 
     def write_footer(self, doc, out):
         out.write('</div>\n')
@@ -52,7 +52,7 @@ class HtmlDocumentRenderer(BaseDocumentRenderer):
             out.write(_res('html_footer.html'))
 
     def write_title_page(self, values, out):
-        out.write('<div class="fontaine-title-page">\n')
+        out.write('<div class="jouvence-title-page">\n')
 
         _elem(out, 'h1', None, _br(values['title']))
         _elem(out, 'p', 'title-page-heading', _br(values['credit']))

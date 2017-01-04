@@ -1,5 +1,5 @@
 import pytest
-from fontaine.renderer import BaseTextRenderer
+from jouvence.renderer import BaseTextRenderer
 
 
 class TestTextRenderer(BaseTextRenderer):

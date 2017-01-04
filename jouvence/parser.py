@@ -6,7 +6,7 @@ from .document import TYPE_ACTION
 logger = logging.getLogger(__name__)
 
 
-class FontaineState:
+class JouvenceState:
     def __init__(self):
         pass
 
@@ -20,12 +20,12 @@ class FontaineState:
         pass
 
 
-class _PassThroughState(FontaineState):
+class _PassThroughState(JouvenceState):
     def consume(self, fp, ctx):
         return ANY_STATE
 
 
-class FontaineParserError(Exception):
+class JouvenceParserError(Exception):
     def __init__(self, line_no, message):
         super().__init__("Error line %d: %s" % (line_no, message))
 
@@ -40,7 +40,7 @@ RE_BLANK_LINE = re.compile(r"^\s*$", re.M)
 RE_TITLE_KEY_VALUE = re.compile(r"^(?P<key>[\w\s\-]+)\s*:\s*")
 
 
-class _TitlePageState(FontaineState):
+class _TitlePageState(JouvenceState):
     def __init__(self):
         super().__init__()
         self._cur_key = None
@@ -89,7 +89,7 @@ RE_SCENE_HEADER_PATTERN = re.compile(
     r"^(int|ext|est|int/ext|int./ext|i/e)[\s\.]", re.I)
 
 
-class _SceneHeaderState(FontaineState):
+class _SceneHeaderState(JouvenceState):
     def match(self, fp, ctx):
         lines = fp.peeklines(3)
         return (
@@ -105,7 +105,7 @@ class _SceneHeaderState(FontaineState):
         return ANY_STATE
 
 
-class _ActionState(FontaineState):
+class _ActionState(JouvenceState):
     def __init__(self):
         super().__init__()
         self.text = ''
@@ -150,7 +150,7 @@ class _ActionState(FontaineState):
 RE_CENTERED_LINE = re.compile(r"^\s*>\s*.*\s*<\s*$", re.M)
 
 
-class _CenteredActionState(FontaineState):
+class _CenteredActionState(JouvenceState):
     def __init__(self):
         super().__init__()
         self.text = ''
@@ -200,7 +200,7 @@ class _CenteredActionState(FontaineState):
 RE_CHARACTER_LINE = re.compile(r"^\s*[A-Z][A-Z\-\._\s]+\s*(\(.*\))?$", re.M)
 
 
-class _CharacterState(FontaineState):
+class _CharacterState(JouvenceState):
     def match(self, fp, ctx):
         lines = fp.peeklines(3)
         return (RE_EMPTY_LINE.match(lines[0]) and
@@ -219,7 +219,7 @@ class _CharacterState(FontaineState):
 RE_PARENTHETICAL_LINE = re.compile(r"^\s*\(.*\)\s*$", re.M)
 
 
-class _ParentheticalState(FontaineState):
+class _ParentheticalState(JouvenceState):
     def match(self, fp, ctx):
         # We only get here from a `_CharacterState` so we know the previous
         # one is already that.
@@ -237,7 +237,7 @@ class _ParentheticalState(FontaineState):
         return ANY_STATE
 
 
-class _DialogState(FontaineState):
+class _DialogState(JouvenceState):
     def __init__(self):
         super().__init__()
         self.text = ''
@@ -275,7 +275,7 @@ class _DialogState(FontaineState):
         ctx.document.lastScene().addDialog(self.text.rstrip('\r\n'))
 
 
-class _LyricsState(FontaineState):
+class _LyricsState(JouvenceState):
     def __init__(self):
         super().__init__()
         self.text = ''
@@ -315,7 +315,7 @@ class _LyricsState(FontaineState):
 RE_TRANSITION_LINE = re.compile(r"^\s*[^a-z]+TO\:$", re.M)
 
 
-class _TransitionState(FontaineState):
+class _TransitionState(JouvenceState):
     def match(self, fp, ctx):
         lines = fp.peeklines(3)
         return (
@@ -334,7 +334,7 @@ class _TransitionState(FontaineState):
 RE_PAGE_BREAK_LINE = re.compile(r"^\=\=\=+$", re.M)
 
 
-class _PageBreakState(FontaineState):
+class _PageBreakState(JouvenceState):
     def match(self, fp, ctx):
         lines = fp.peeklines(3)
         return (
@@ -349,7 +349,7 @@ class _PageBreakState(FontaineState):
         return ANY_STATE
 
 
-class _ForcedParagraphStates(FontaineState):
+class _ForcedParagraphStates(JouvenceState):
     STATE_SYMBOLS = {
         '.': _SceneHeaderState,
         '!': _ActionState,
@@ -389,7 +389,7 @@ class _ForcedParagraphStates(FontaineState):
         return self._state_cls()
 
 
-class _EmptyLineState(FontaineState):
+class _EmptyLineState(JouvenceState):
     def __init__(self):
         super().__init__()
         self.line_count = 0
@@ -477,7 +477,7 @@ class _PeekableFile:
         self.line_no = 0
 
 
-class _FontaineStateMachine:
+class _JouvenceStateMachine:
     def __init__(self, fp, doc):
         self.fp = _PeekableFile(fp)
         self.state = None
@@ -516,7 +516,7 @@ class _FontaineStateMachine:
             # Figure out what to do next...
 
             if res is None:
-                raise FontaineParserError(
+                raise JouvenceParserError(
                     self.line_no,
                     "State '%s' returned a `None` result. "
                     "States need to return `ANY_STATE`, one or more specific "
@@ -549,7 +549,7 @@ class _FontaineStateMachine:
                     self.state.exit(self, res)
                 self.state = res
 
-            elif isinstance(res, FontaineState):
+            elif isinstance(res, JouvenceState):
                 # State wants to exit, wants a specific state to be next.
                 if self.state:
                     self.state.exit(self, res)
@@ -565,7 +565,7 @@ class _FontaineStateMachine:
                 raise Exception("Unsupported state result: %s" % res)
 
 
-class FontaineParser:
+class JouvenceParser:
     def __init__(self):
         pass
 
@@ -582,8 +582,8 @@ class FontaineParser:
             return self._doParse(fp)
 
     def _doParse(self, fp):
-        from .document import FontaineDocument
-        doc = FontaineDocument()
-        machine = _FontaineStateMachine(fp, doc)
+        from .document import JouvenceDocument
+        doc = JouvenceDocument()
+        machine = _JouvenceStateMachine(fp, doc)
         machine.run()
         return doc

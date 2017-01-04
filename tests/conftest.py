@@ -3,32 +3,32 @@ import sys
 import logging
 import yaml
 import pytest
-from fontaine.document import (
-    FontaineSceneElement,
+from jouvence.document import (
+    JouvenceSceneElement,
     TYPE_ACTION, TYPE_CENTEREDACTION, TYPE_CHARACTER, TYPE_DIALOG,
     TYPE_PARENTHETICAL, TYPE_TRANSITION, TYPE_LYRICS, TYPE_PAGEBREAK,
     TYPE_EMPTYLINES,
     _scene_element_type_str)
-from fontaine.parser import FontaineParser, FontaineParserError
+from jouvence.parser import JouvenceParser, JouvenceParserError
 
 
 def pytest_addoption(parser):
     parser.addoption(
             '--log-debug',
             action='store_true',
-            help="Sets the Fontaine logger to output debug info to stdout.")
+            help="Sets the Jouvence logger to output debug info to stdout.")
 
 
 def pytest_configure(config):
     if config.getoption('--log-debug'):
         hdl = logging.StreamHandler(stream=sys.stdout)
-        logging.getLogger('fontaine').addHandler(hdl)
-        logging.getLogger('fontaine').setLevel(logging.DEBUG)
+        logging.getLogger('jouvence').addHandler(hdl)
+        logging.getLogger('jouvence').setLevel(logging.DEBUG)
 
 
 def pytest_collect_file(parent, path):
     if path.ext == '.yaml' and path.basename.startswith("test"):
-        return FontaineScriptTestFile(path, parent)
+        return JouvenceScriptTestFile(path, parent)
     return None
 
 
@@ -48,11 +48,11 @@ def assert_scene(actual, header, paragraphs):
 
 def assert_paragraph(actual, expected):
     if isinstance(expected, str):
-        assert isinstance(actual, FontaineSceneElement)
+        assert isinstance(actual, JouvenceSceneElement)
         assert actual.type == TYPE_ACTION
         assert actual.text == expected
-    elif isinstance(expected, FontaineSceneElement):
-        assert isinstance(actual, FontaineSceneElement)
+    elif isinstance(expected, JouvenceSceneElement):
+        assert isinstance(actual, JouvenceSceneElement)
         assert actual.type == expected.type
         assert actual.text == expected.text
     else:
@@ -60,23 +60,23 @@ def assert_paragraph(actual, expected):
 
 
 def _c(name):
-    return FontaineSceneElement(TYPE_CHARACTER, name)
+    return JouvenceSceneElement(TYPE_CHARACTER, name)
 
 
 def _p(text):
-    return FontaineSceneElement(TYPE_PARENTHETICAL, text)
+    return JouvenceSceneElement(TYPE_PARENTHETICAL, text)
 
 
 def _d(text):
-    return FontaineSceneElement(TYPE_DIALOG, text)
+    return JouvenceSceneElement(TYPE_DIALOG, text)
 
 
 def _t(text):
-    return FontaineSceneElement(TYPE_TRANSITION, text)
+    return JouvenceSceneElement(TYPE_TRANSITION, text)
 
 
 def _l(text):
-    return FontaineSceneElement(TYPE_LYRICS, text)
+    return JouvenceSceneElement(TYPE_LYRICS, text)
 
 
 class UnexpectedScriptOutput(Exception):
@@ -85,23 +85,23 @@ class UnexpectedScriptOutput(Exception):
         self.expected = expected
 
 
-class FontaineScriptTestFile(pytest.File):
+class JouvenceScriptTestFile(pytest.File):
     def collect(self):
         spec = yaml.load_all(self.fspath.open(encoding='utf8'))
         for i, item in enumerate(spec):
             name = '%s_%d' % (self.fspath.basename, i)
             if 'test_name' in item:
                 name += '_%s' % item['test_name']
-            yield FontaineScriptTestItem(name, self, item)
+            yield JouvenceScriptTestItem(name, self, item)
 
 
-class FontaineScriptTestItem(pytest.Item):
+class JouvenceScriptTestItem(pytest.Item):
     def __init__(self, name, parent, spec):
         super().__init__(name, parent)
         self.spec = spec
 
     def reportinfo(self):
-        return self.fspath, 0, "fontaine script test: %s" % self.name
+        return self.fspath, 0, "jouvence script test: %s" % self.name
 
     def runtest(self):
         intext = self.spec.get('in')
@@ -110,7 +110,7 @@ class FontaineScriptTestItem(pytest.Item):
         if intext is None or expected is None:
             raise Exception("No 'in' or 'out' specified.")
 
-        parser = FontaineParser()
+        parser = JouvenceParser()
         doc = parser.parseString(intext)
         if title is not None:
             assert title == doc.title_values
@@ -122,7 +122,7 @@ class FontaineScriptTestItem(pytest.Item):
             raise UnexpectedScriptOutput(doc.scenes, exp_scenes)
 
     def repr_failure(self, excinfo):
-        if isinstance(excinfo.value, FontaineParserError):
+        if isinstance(excinfo.value, JouvenceParserError):
             return ('\n'.join(
                 ['Parser error:', str(excinfo.value)]))
         if isinstance(excinfo.value, UnexpectedScriptOutput):
@@ -167,12 +167,12 @@ def make_scenes(spec):
 
     for item in spec:
         if item == '<pagebreak>':
-            cur_paras.append(FontaineSceneElement(TYPE_PAGEBREAK, None))
+            cur_paras.append(JouvenceSceneElement(TYPE_PAGEBREAK, None))
             continue
 
         if RE_BLANK_LINE.match(item):
             text = len(item) * '\n'
-            cur_paras.append(FontaineSceneElement(TYPE_EMPTYLINES, text))
+            cur_paras.append(JouvenceSceneElement(TYPE_EMPTYLINES, text))
             continue
 
         token = item[:1]
@@ -184,7 +184,7 @@ def make_scenes(spec):
         elif token == '!':
             if item[1:3] == '><':
                 cur_paras.append(
-                    FontaineSceneElement(TYPE_CENTEREDACTION, item[3:]))
+                    JouvenceSceneElement(TYPE_CENTEREDACTION, item[3:]))
             else:
                 cur_paras.append(item[1:])
         elif token == '@':

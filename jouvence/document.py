@@ -1,13 +1,13 @@
 import sys
 
 
-class FontaineDocument:
+class JouvenceDocument:
     def __init__(self):
         self.title_values = {}
         self.scenes = []
 
     def addScene(self, header=None):
-        s = FontaineScene()
+        s = JouvenceScene()
         if header:
             s.header = header
         self.scenes.append(s)
@@ -29,7 +29,7 @@ class FontaineDocument:
         return None
 
 
-class FontaineScene:
+class JouvenceScene:
     def __init__(self):
         self.header = None
         self.paragraphs = []
@@ -46,7 +46,7 @@ class FontaineScene:
                                    'TYPE_%s' % add_type_name.upper())
 
                 def _type_adder(_text):
-                    new_p = FontaineSceneElement(add_type, _text)
+                    new_p = JouvenceSceneElement(add_type, _text)
                     self.paragraphs.append(new_p)
                     return new_p
 
@@ -57,7 +57,7 @@ class FontaineScene:
             raise AttributeError
 
     def addPageBreak(self):
-        self.paragraphs.append(FontaineSceneElement(TYPE_PAGEBREAK, None))
+        self.paragraphs.append(JouvenceSceneElement(TYPE_PAGEBREAK, None))
 
     def lastParagraph(self):
         try:
@@ -66,7 +66,7 @@ class FontaineScene:
             return None
 
 
-class FontaineSceneElement:
+class JouvenceSceneElement:
     def __init__(self, el_type, text):
         self.type = el_type
         self.text = text

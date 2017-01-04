@@ -1,5 +1,5 @@
 import re
-from fontaine.document import (
+from jouvence.document import (
     TYPE_ACTION, TYPE_CENTEREDACTION, TYPE_CHARACTER, TYPE_DIALOG,
     TYPE_PARENTHETICAL, TYPE_TRANSITION, TYPE_LYRICS, TYPE_PAGEBREAK)
 

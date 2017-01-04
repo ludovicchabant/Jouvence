@@ -20,14 +20,14 @@ long_description = read('README.rst')
 
 
 setup(
-    name="Fontaine",
-    use_scm_version={'write_to': 'fontaine/version.py'},
+    name="Jouvence",
+    use_scm_version={'write_to': 'jouvence/version.py'},
     description="A library for parsing and rendering Fountain screenplays.",
     long_description=long_description,
     author="Ludovic Chabant",
     author_email="ludovic@chabant.com",
     license="Apache License 2.0",
-    url="https://bolt80.com/fontaine",
+    url="https://bolt80.com/jouvence",
     keywords='fountain screenplay screenwriting screenwriter',
     packages=find_packages(),
     include_package_data=True,
@@ -37,6 +37,6 @@ setup(
     install_requires=install_requires,
     entry_points={
         'console_scripts': [
-            'fontaine = fontaine.cli.main'
+            'jouvence = jouvence.cli.main'
         ]}
 )
