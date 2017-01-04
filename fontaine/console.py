@@ -1,11 +1,10 @@
 import os
-import sys
 import colorama
 from .renderer import BaseDocumentRenderer, BaseTextRenderer
 
 
-def _w(style, text, reset_all=False):
-    f = sys.stdout.write
+def _w(out, style, text, reset_all=False):
+    f = out.write
     f(style)
     f(text)
     if not reset_all:
@@ -21,53 +20,53 @@ class ConsoleDocumentRenderer(BaseDocumentRenderer):
         self.width = width
         colorama.init()
 
-    def write_title_heading(self, text):
-        print("")
+    def write_title_heading(self, text, out):
+        print("", file=out)
         for line in text.split('\n'):
-            print(line.center(self.width))
-        print("")
-        print("")
+            print(line.center(self.width), file=out)
+        print("", file=out)
+        print("", file=out)
 
-    def write_title_footer(self, text):
-        _w(colorama.Style.DIM, text)
-        print("")
-        _w(colorama.Style.DIM, 80 * '=')
+    def write_title_footer(self, text, out):
+        _w(out, colorama.Style.DIM, text)
+        print("", file=out)
+        _w(out, colorama.Style.DIM, 80 * '=')
 
-    def write_scene_heading(self, text):
-        print("")
-        _w(colorama.Fore.WHITE + colorama.Style.BRIGHT, text, True)
+    def write_scene_heading(self, text, out):
+        print("", file=out)
+        _w(out, colorama.Fore.WHITE + colorama.Style.BRIGHT, text, True)
 
-    def write_action(self, text):
-        print(text)
+    def write_action(self, text, out):
+        print(text, file=out)
 
-    def write_centeredaction(self, text):
-        print("")
+    def write_centeredaction(self, text, out):
+        print("", file=out)
         for line in text.split('\n'):
-            print(line.center(self.width))
+            print(line.center(self.width), file=out)
 
-    def write_character(self, text):
-        print("")
-        _w(colorama.Fore.WHITE, "\t\t\t" + text, True)
+    def write_character(self, text, out):
+        print("", file=out)
+        _w(out, colorama.Fore.WHITE, "\t\t\t" + text, True)
 
-    def write_dialog(self, text):
+    def write_dialog(self, text, out):
         for line in text.split('\n'):
-            print("\t" + line)
+            print("\t" + line, file=out)
 
-    def write_parenthetical(self, text):
+    def write_parenthetical(self, text, out):
         for line in text.split('\n'):
-            print("\t\t" + line)
+            print("\t\t" + line, file=out)
 
-    def write_transition(self, text):
-        print("")
-        print("\t\t\t\t" + text)
+    def write_transition(self, text, out):
+        print("", file=out)
+        print("\t\t\t\t" + text, file=out)
 
-    def write_lyrics(self, text):
-        print("")
-        _w(colorama.Fore.MAGENTA, text, True)
+    def write_lyrics(self, text, out):
+        print("", file=out)
+        _w(out, colorama.Fore.MAGENTA, text, True)
 
-    def write_pagebreak(self):
-        print("")
-        _w(colorama.Style.DIM, 80 * '=')
+    def write_pagebreak(self, out):
+        print("", file=out)
+        _w(out, colorama.Style.DIM, 80 * '=')
 
 
 class ConsoleTextRenderer(BaseTextRenderer):

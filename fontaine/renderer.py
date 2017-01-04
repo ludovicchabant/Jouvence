@@ -24,14 +24,14 @@ class BaseDocumentRenderer:
     def _tr(self, text):
         return self.text_renderer.render_text(text)
 
-    def render_doc(self, doc):
-        self.write_header(doc)
-        self.render_title_page(doc.title_values)
+    def render_doc(self, doc, out):
+        self.write_header(doc, out)
+        self.render_title_page(doc.title_values, out)
         for s in doc.scenes:
-            self.render_scene(s)
-        self.write_footer(doc)
+            self.render_scene(s, out)
+        self.write_footer(doc, out)
 
-    def render_title_page(self, values):
+    def render_title_page(self, values, out):
         # Render known metadata.
         title = values.get('title')
         credit = values.get('credit')
@@ -40,62 +40,62 @@ class BaseDocumentRenderer:
         center_text = '\n\n'.join([
             i for i in [title, credit, author, source]
             if i is not None])
-        self.write_title_heading(self._tr(center_text))
+        self.write_title_heading(self._tr(center_text), out)
 
         ddate = values.get('date') or values.get('draft date')
         contact = values.get('contact')
         bottom_text = '\n\n'.join([
             i for i in [ddate, contact]
             if i is not None])
-        self.write_title_footer(self._tr(bottom_text))
+        self.write_title_footer(self._tr(bottom_text), out)
 
-    def render_scene(self, scene):
+    def render_scene(self, scene, out):
         if scene.header is not None:
-            self.write_scene_heading(scene.header)
+            self.write_scene_heading(scene.header, out)
         for p in scene.paragraphs:
             rdr_func = self._para_rdrs[p.type]
             if p.type != TYPE_PAGEBREAK:
-                rdr_func(self._tr(p.text))
+                rdr_func(self._tr(p.text), out)
             else:
-                rdr_func()
+                rdr_func(out)
 
-    def write_header(self, doc):
+    def write_header(self, doc, out):
         pass
 
-    def write_footer(self, doc):
+    def write_footer(self, doc, out):
         pass
 
-    def write_title_heading(self, text):
+    def write_title_heading(self, text, out):
         raise NotImplementedError()
 
-    def write_title_footer(self, text):
+    def write_title_footer(self, text, out):
         raise NotImplementedError()
 
-    def write_scene_heading(self, text):
+    def write_scene_heading(self, text, out):
         raise NotImplementedError()
 
-    def write_action(self, text):
+    def write_action(self, text, out):
         raise NotImplementedError()
 
-    def write_centeredaction(self, text):
+    def write_centeredaction(self, text, out):
         raise NotImplementedError()
 
-    def write_character(self, text):
+    def write_character(self, text, out):
         raise NotImplementedError()
 
-    def write_dialog(self, text):
+    def write_dialog(self, text, out):
         raise NotImplementedError()
 
-    def write_parenthetical(self, text):
+    def write_parenthetical(self, text, out):
         raise NotImplementedError()
 
-    def write_transition(self, text):
+    def write_transition(self, text, out):
         raise NotImplementedError()
 
-    def write_lyrics(self, text):
+    def write_lyrics(self, text, out):
         raise NotImplementedError()
 
-    def write_pagebreak(self):
+    def write_pagebreak(self, out):
         raise NotImplementedError()
 
 
