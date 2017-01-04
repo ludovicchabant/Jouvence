@@ -37,6 +37,6 @@ setup(
     install_requires=install_requires,
     entry_points={
         'console_scripts': [
-            'jouvence = jouvence.cli.main'
+            'jouvence = jouvence.cli:main'
         ]}
 )
