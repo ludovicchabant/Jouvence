@@ -20,15 +20,25 @@ class ConsoleDocumentRenderer(BaseDocumentRenderer):
         self.width = width
         colorama.init()
 
-    def write_title_heading(self, text, out):
+    def write_title_page(self, values, out):
+        known = ['title', 'credit', 'author', 'source']
+        center_values = [values.get(i) for i in known
+                         if i is not None]
+
         print("", file=out)
-        for line in text.split('\n'):
-            print(line.center(self.width), file=out)
+        for val in center_values:
+            for l in val.split('\n'):
+                print(l.center(self.width), file=out)
+            print("", file=out)
         print("", file=out)
         print("", file=out)
 
-    def write_title_footer(self, text, out):
-        _w(out, colorama.Style.DIM, text)
+        ddate = values.get('date') or values.get('draft date')
+        contact = values.get('contact')
+        bottom_lines = [i for i in [ddate, contact]
+                        if i is not None]
+
+        _w(out, colorama.Style.DIM, '\n\n'.join(bottom_lines))
         print("", file=out)
         _w(out, colorama.Style.DIM, 80 * '=')
 

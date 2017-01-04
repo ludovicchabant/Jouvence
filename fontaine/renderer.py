@@ -32,22 +32,13 @@ class BaseDocumentRenderer:
         self.write_footer(doc, out)
 
     def render_title_page(self, values, out):
-        # Render known metadata.
-        title = values.get('title')
-        credit = values.get('credit')
-        author = values.get('author') or values.get('authors')
-        source = values.get('source')
-        center_text = '\n\n'.join([
-            i for i in [title, credit, author, source]
-            if i is not None])
-        self.write_title_heading(self._tr(center_text), out)
-
-        ddate = values.get('date') or values.get('draft date')
-        contact = values.get('contact')
-        bottom_text = '\n\n'.join([
-            i for i in [ddate, contact]
-            if i is not None])
-        self.write_title_footer(self._tr(bottom_text), out)
+        clean_values = values.copy()
+        clean_values.setdefault('title', 'Untitled Screenplay')
+        clean_values.setdefault('credit', 'Written by')
+        clean_values.setdefault('author', 'Unknown')
+        for k in clean_values:
+            clean_values[k] = self._tr(clean_values[k])
+        self.write_title_page(clean_values, out)
 
     def render_scene(self, scene, out):
         if scene.header is not None:
@@ -65,10 +56,7 @@ class BaseDocumentRenderer:
     def write_footer(self, doc, out):
         pass
 
-    def write_title_heading(self, text, out):
-        raise NotImplementedError()
-
-    def write_title_footer(self, text, out):
+    def write_title_page(self, values, out):
         raise NotImplementedError()
 
     def write_scene_heading(self, text, out):
