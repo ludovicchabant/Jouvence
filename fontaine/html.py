@@ -1,0 +1,110 @@
+import os.path
+from markupsafe import escape
+from .renderer import BaseDocumentRenderer, BaseTextRenderer
+
+
+def _elem(out, elem_name, class_name, contents):
+    f = out.write
+    f('<%s' % elem_name)
+    if class_name:
+        f(' class="fontaine-%s"' % class_name)
+    f('>')
+    f(contents)
+    f('</%s>\n' % elem_name)
+
+
+def _br(text, strip_first=False):
+    lines = text.split('\n')
+    if strip_first and lines[0].strip() == '':
+        lines = lines[1:]
+    return '<br/>\n'.join(lines)
+
+
+def _res(filename):
+    path = os.path.join(os.path.dirname(__file__), 'resources', filename)
+    with open(path, 'r') as fp:
+        return fp.read()
+
+
+class HtmlDocumentRenderer(BaseDocumentRenderer):
+    def __init__(self, standalone=True):
+        super().__init__(HtmlTextRenderer())
+        self.standalone = standalone
+
+    def get_css(self):
+        return _res('html_styles.css')
+
+    def write_header(self, doc, out):
+        if self.standalone:
+            meta = doc.title_values.get
+            data = {
+                # TODO: need a "strip formatting" to have a clean title.
+                'title': meta('title', "Fountain Screenplay"),
+                'description': meta('description', ''),
+                'css': self.get_css()
+            }
+            out.write(_res('html_header.html') % data)
+        out.write('<div class="fontaine-doc">\n')
+
+    def write_footer(self, doc, out):
+        out.write('</div>\n')
+        if self.standalone:
+            out.write(_res('html_footer.html'))
+
+    def write_title_page(self, values, out):
+        out.write('<div class="fontaine-title-page">\n')
+
+        _elem(out, 'h1', None, _br(values['title']))
+        _elem(out, 'p', 'title-page-heading', _br(values['credit']))
+        _elem(out, 'p', 'title-page-heading', _br(values['author']))
+
+        ddate = values.get('date') or values.get('draft date')
+        if ddate:
+            _elem(out, 'p', 'title-page-footer', _br(ddate))
+        contact = values.get('contact')
+        if contact:
+            _elem(out, 'p', 'title-page-footer', _br(contact))
+
+        out.write('</div>\n')
+        self.write_pagebreak(out)
+
+    def write_scene_heading(self, text, out):
+        _elem(out, 'p', 'scene-heading', text)
+
+    def write_action(self, text, out):
+        _elem(out, 'p', 'action', _br(text, True))
+
+    def write_centeredaction(self, text, out):
+        _elem(out, 'p', 'action-centered', _br(text, True))
+
+    def write_character(self, text, out):
+        _elem(out, 'p', 'character', text)
+
+    def write_dialog(self, text, out):
+        _elem(out, 'p', 'dialog', _br(text))
+
+    def write_parenthetical(self, text, out):
+        _elem(out, 'p', 'parenthetical', text)
+
+    def write_transition(self, text, out):
+        _elem(out, 'p', 'transition', text)
+
+    def write_lyrics(self, text, out):
+        _elem(out, 'p', 'lyrics', _br(text, True))
+
+    def write_pagebreak(self, out):
+        out.write('<hr/>\n')
+
+
+class HtmlTextRenderer(BaseTextRenderer):
+    def render_text(self, text):
+        return super().render_text(escape(text))
+
+    def make_italics(self, text):
+        return '<em>%s</em>' % text
+
+    def make_bold(self, text):
+        return '<strong>%s</strong>' % text
+
+    def make_underline(self, text):
+        return '<u>%s</u>' % text

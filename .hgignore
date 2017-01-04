@@ -2,4 +2,6 @@ syntax:glob
 __pycache__
 venv
 .cache
+.sass-cache
+*.css.map
 *.pyc

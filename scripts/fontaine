@@ -11,15 +11,22 @@ def main():
     parser = argparse.ArgumentParser(
         description='Fontaine command line utility')
     parser.add_argument('script')
+    parser.add_argument('out_file', nargs='?')
     args = parser.parse_args()
 
     from fontaine.parser import FontaineParser
-    from fontaine.console import ConsoleDocumentRenderer
     p = FontaineParser()
     doc = p.parse(args.script)
-    rdr = ConsoleDocumentRenderer()
-    rdr.render_doc(doc)
 
+    if not args.out_file:
+        from fontaine.console import ConsoleDocumentRenderer
+        rdr = ConsoleDocumentRenderer()
+        rdr.render_doc(doc, sys.stdout)
+    else:
+        from fontaine.html import HtmlDocumentRenderer
+        rdr = HtmlDocumentRenderer()
+        with open(args.out_file, 'w') as fp:
+            rdr.render_doc(doc, fp)
 
 if __name__ == '__main__':
     main()

@@ -1,0 +1,16 @@
+.fontaine-doc {
+  font-family: "Courier Prime", "Courier New", Courier, sans-serif; }
+  .fontaine-doc h1, .fontaine-doc .fontaine-title-page-heading {
+    text-align: center; }
+  .fontaine-doc .fontaine-scene-heading {
+    font-weight: bold; }
+  .fontaine-doc .fontaine-character {
+    margin: auto 12rem 0 12rem; }
+  .fontaine-doc .fontaine-parenthetical {
+    margin: 0 8rem 0 8rem; }
+  .fontaine-doc .fontaine-dialog {
+    margin: 0 4rem 0 4rem; }
+  .fontaine-doc .fontaine-action-centered {
+    text-align: center; }
+
+/*# sourceMappingURL=html_styles.css.map */
