@@ -7,5 +7,6 @@ venv
 *.css.map
 *.pyc
 
+dist
 Jouvence.egg-info
 jouvence/version.py
