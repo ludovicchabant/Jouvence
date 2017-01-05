@@ -34,3 +34,11 @@ out:
     - "!"
     - ".EXT. ANOTHER PLACE"
     - "!\nThis is an action I think."
+---
+in: |
+    .somewhere in space
+
+    We are in space!
+out:
+    - ".somewhere in space"
+    - "!\nWe are in space!"

@@ -1,0 +1,29 @@
+---
+in: |
+    CUT TO:
+
+    INT. BEDROOM
+
+    This is the bedroom.
+out:
+    - ">CUT TO:"
+    - ".INT. BEDROOM"
+    - "!\nThis is the bedroom."
+---
+in: |
+    >fade to black
+
+    EXT. A BLACK HOLE
+
+    This is a black hole.
+out:
+    - ">fade to black"
+    - ".EXT. A BLACK HOLE"
+    - "!\nThis is a black hole."
+---
+in: |
+    NOT A TRANSITION TO:  
+
+    Because it has spaces after the colon.
+out:
+    - "!NOT A TRANSITION TO:  \n\nBecause it has spaces after the colon."

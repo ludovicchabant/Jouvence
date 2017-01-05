@@ -20,11 +20,6 @@ class JouvenceState:
         pass
 
 
-class _PassThroughState(JouvenceState):
-    def consume(self, fp, ctx):
-        return ANY_STATE
-
-
 class JouvenceParserError(Exception):
     def __init__(self, line_no, message):
         super().__init__("Error line %d: %s" % (line_no, message))
@@ -46,11 +41,18 @@ class _TitlePageState(JouvenceState):
         self._cur_key = None
         self._cur_val = None
 
-    def match(self, fp, ctx):
-        line = fp.peekline()
-        return RE_TITLE_KEY_VALUE.match(line)
-
     def consume(self, fp, ctx):
+        line = fp.peekline()
+        is_match = RE_TITLE_KEY_VALUE.match(line)
+        is_line1_empty = RE_EMPTY_LINE.match(line)
+        if not is_match:
+            logger.debug("No title page value found on line 1.")
+            if not is_line1_empty:
+                # Add a fake empty line at the beginning of the text if
+                # there's not one already. This makes state matching easier.
+                fp._addBlankAt0()
+            return ANY_STATE
+
         while True:
             line = fp.readline()
             if not line:
@@ -68,8 +70,21 @@ class _TitlePageState(JouvenceState):
                 self._cur_val += line.lstrip()
 
             if RE_EMPTY_LINE.match(fp.peekline()):
-                self._commit(ctx)
+                if (self._cur_key and
+                        not self._cur_val and
+                        not ctx.document.title_values):
+                    # We thought there was a title page, but it turns out
+                    # we probably mistakenly matched something like a
+                    # transition.
+                    logger.debug("Aborting title page parsing, resetting "
+                                 "back to first line.")
+                    fp.reset()
+                    if not is_line1_empty:
+                        fp._addBlankAt0()
+                    break
+
                 # Finished with the page title, now move on to the first scene.
+                self._commit(ctx)
                 break
 
         return ANY_STATE
@@ -429,11 +444,14 @@ class _PeekableFile:
     def __init__(self, fp):
         self.line_no = 1
         self._fp = fp
-        self._blankAt0 = False
+        # This is for adding a "fake" blank line at the beginning of the
+        # file, to help with match things on the first line.
+        # (has blank line, is blank line unread)
+        self._blankAt0 = (False, False)
 
     def readline(self):
-        if self._blankAt0:
-            self._blankAt0 = False
+        if self._blankAt0[1]:
+            self._blankAt0 = (True, False)
             self.line_no = 0
             return '\n'
 
@@ -442,7 +460,7 @@ class _PeekableFile:
         return data
 
     def peekline(self):
-        if self._blankAt0:
+        if self._blankAt0[1]:
             return '\n'
 
         pos = self._fp.tell()
@@ -453,7 +471,7 @@ class _PeekableFile:
     def peeklines(self, count):
         pos = self._fp.tell()
         lines = []
-        if self._blankAt0:
+        if self._blankAt0[1]:
             lines.append('\n')
             count -= 1
         for i in range(count):
@@ -469,11 +487,20 @@ class _PeekableFile:
         self._blankAt0 = snapshot[1]
         self.line_no = snapshot[2]
 
+    def reset(self):
+        self._fp.seek(0)
+        if self._blankAt0[0]:
+            self._blankAt0 = (True, True)
+            self.line_no = 0
+        else:
+            self._blankAt0 = (False, False)
+            self.line_no = 1
+
     def _addBlankAt0(self):
         if self._fp.tell() != 0:
             raise Exception(
                 "Can't add blank line at 0 if reading has started.")
-        self._blankAt0 = True
+        self._blankAt0 = (True, True)
         self.line_no = 0
 
 
@@ -488,21 +515,9 @@ class _JouvenceStateMachine:
         return self.fp.line_no
 
     def run(self):
-        # Start with the page title... unless it doesn't match, in which
-        # case we start with a "pass through" state that will just return
-        # `ANY_STATE` so we can start matching stuff.
-        self.state = _TitlePageState()
-        if not self.state.match(self.fp, self):
-            logger.debug("No title page value found on line 1, "
-                         "using pass-through state with added blank line.")
-            self.state = _PassThroughState()
-            if not RE_EMPTY_LINE.match(self.fp.peekline()):
-                # Add a fake empty line at the beginning of the text if
-                # there's not one already. This makes state matching easier.
-                self.fp._addBlankAt0()
-
         # Start parsing! Here we try to do a mostly-forward-only parser with
         # non overlapping regexes to make it decently fast.
+        self.state = _TitlePageState()
         while True:
             logger.debug("State '%s' consuming from '%s'..." %
                          (self.state.__class__.__name__, self.fp.peekline()))
