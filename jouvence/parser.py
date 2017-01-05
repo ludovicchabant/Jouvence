@@ -163,7 +163,7 @@ class _ActionState(JouvenceState):
             ctx.document.lastScene().addAction(self.text)
 
 
-RE_CENTERED_LINE = re.compile(r"^\s*>\s*.*\s*<\s*$", re.M)
+RE_CENTERED_LINE = re.compile(r"^\s*>\s*.*\s*<\s*$")
 
 
 class _CenteredActionState(JouvenceState):
@@ -213,7 +213,7 @@ class _CenteredActionState(JouvenceState):
             ctx.document.lastScene().addCenteredAction(self.text)
 
 
-RE_CHARACTER_LINE = re.compile(r"^\s*[A-Z][A-Z\-\._\s]+\s*(\(.*\))?$", re.M)
+RE_CHARACTER_LINE = re.compile(r"^\s*[A-Z][A-Z\-\._\s]+\s*(\(.*\))?$")
 
 
 class _CharacterState(JouvenceState):
@@ -232,7 +232,7 @@ class _CharacterState(JouvenceState):
         return [_ParentheticalState, _DialogState]
 
 
-RE_PARENTHETICAL_LINE = re.compile(r"^\s*\(.*\)\s*$", re.M)
+RE_PARENTHETICAL_LINE = re.compile(r"^\s*\(.*\)\s*$")
 
 
 class _ParentheticalState(JouvenceState):
@@ -328,7 +328,7 @@ class _LyricsState(JouvenceState):
             ctx.document.lastScene().addLyrics(self.text)
 
 
-RE_TRANSITION_LINE = re.compile(r"^\s*[^a-z]+TO\:$", re.M)
+RE_TRANSITION_LINE = re.compile(r"^\s*[^a-z]+TO\:$")
 
 
 class _TransitionState(JouvenceState):
@@ -347,7 +347,7 @@ class _TransitionState(JouvenceState):
         return ANY_STATE
 
 
-RE_PAGE_BREAK_LINE = re.compile(r"^\=\=\=+$", re.M)
+RE_PAGE_BREAK_LINE = re.compile(r"^\=\=\=+$")
 
 
 class _PageBreakState(JouvenceState):
@@ -405,8 +405,8 @@ class _ForcedParagraphStates(JouvenceState):
         return self._state_cls()
 
 
-RE_BONEYARD_START = re.compile(r"^/\*", re.M)
-RE_BONEYARD_END = re.compile(r"\*/\s*$", re.M)
+RE_BONEYARD_START = re.compile(r"^/\*")
+RE_BONEYARD_END = re.compile(r"\*/\s*$")
 
 
 class _BoneyardState(JouvenceState):
@@ -418,6 +418,45 @@ class _BoneyardState(JouvenceState):
             fp.readline()
             if RE_BONEYARD_END.match(fp.peekline()):
                 break
+        return ANY_STATE
+
+
+RE_SECTION_LINE = re.compile(r"^(?P<depth>#+)\s*")
+
+
+class _SectionState(JouvenceState):
+    def match(self, fp, ctx):
+        lines = fp.peeklines(3)
+        return (RE_EMPTY_LINE.match(lines[0]) and
+                RE_SECTION_LINE.match(lines[1]) and
+                RE_EMPTY_LINE.match(lines[2]))
+
+    def consume(self, fp, ctx):
+        fp.readline()
+        line = fp.readline()
+        m = RE_SECTION_LINE.match(line)
+        depth = len(m.group('depth'))
+        line = line[m.end():].rstrip('\r\n')
+        ctx.document.lastScene().addSection(depth, line)
+        return ANY_STATE
+
+
+RE_SYNOPSIS_LINE = re.compile(r"^=[^=]")
+
+
+class _SynopsisState(JouvenceState):
+    def match(self, fp, ctx):
+        lines = fp.peeklines(3)
+        return (RE_EMPTY_LINE.match(lines[0]) and
+                RE_SYNOPSIS_LINE.match(lines[1]) and
+                RE_EMPTY_LINE.match(lines[2]))
+
+    def consume(self, fp, ctx):
+        fp.readline()
+        line = fp.readline()
+        line = line[1:].lstrip()  # Remove the `#`, and the following spaces.
+        line = line.rstrip('\r\n')
+        ctx.document.lastScene().addSynopsis(line)
         return ANY_STATE
 
 
@@ -457,6 +496,8 @@ ROOT_STATES = [
     _TransitionState,
     _PageBreakState,
     _CenteredActionState,
+    _SectionState,
+    _SynopsisState,
     _BoneyardState,
     _EmptyLineState,   # Must be second to last.
     _ActionState,  # Must be last.

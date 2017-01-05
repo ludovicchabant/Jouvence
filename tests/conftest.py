@@ -4,10 +4,10 @@ import logging
 import yaml
 import pytest
 from jouvence.document import (
-    JouvenceSceneElement,
+    JouvenceSceneElement, JouvenceSceneSection,
     TYPE_ACTION, TYPE_CENTEREDACTION, TYPE_CHARACTER, TYPE_DIALOG,
     TYPE_PARENTHETICAL, TYPE_TRANSITION, TYPE_LYRICS, TYPE_PAGEBREAK,
-    TYPE_EMPTYLINES,
+    TYPE_SYNOPSIS,
     _scene_element_type_str)
 from jouvence.parser import JouvenceParser, JouvenceParserError
 
@@ -170,11 +170,6 @@ def make_scenes(spec):
             cur_paras.append(JouvenceSceneElement(TYPE_PAGEBREAK, None))
             continue
 
-        if RE_BLANK_LINE.match(item):
-            text = len(item) * '\n'
-            cur_paras.append(JouvenceSceneElement(TYPE_EMPTYLINES, text))
-            continue
-
         token = item[:1]
         if token == '.':
             if cur_header or cur_paras:
@@ -197,6 +192,12 @@ def make_scenes(spec):
             cur_paras.append(_t(item[1:]))
         elif token == '~':
             cur_paras.append(_l(item[1:]))
+        elif token == '#':
+            cur_paras.append(
+                JouvenceSceneSection(1, item[1:]))
+        elif token == '+':
+            cur_paras.append(
+                JouvenceSceneElement(TYPE_SYNOPSIS, item[1:]))
         else:
             raise Exception("Unknown token: %s" % token)
     if cur_header or cur_paras:

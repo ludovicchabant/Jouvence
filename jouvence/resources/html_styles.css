@@ -1,5 +1,15 @@
 .jouvence-doc {
-  font-family: "Courier Prime", "Courier New", Courier, sans-serif; }
+  font-family: "Courier Prime", "Courier New", Courier, sans-serif;
+  background-color: #fff;
+  color: #111; }
+  .jouvence-doc hr {
+    border: none;
+    height: 1px;
+    background: #aaa; }
+  .jouvence-doc .jouvence-main {
+    padding: 2em 0; }
+    .jouvence-doc .jouvence-main p {
+      padding: 0 2em; }
   .jouvence-doc h1, .jouvence-doc .jouvence-title-page-heading {
     text-align: center; }
   .jouvence-doc .jouvence-scene-heading {
@@ -12,5 +22,17 @@
     margin: 0 4rem 0 4rem; }
   .jouvence-doc .jouvence-action-centered {
     text-align: center; }
+  .jouvence-doc p.jouvence-section {
+    background-color: #ccc;
+    padding: 1rem; }
+  .jouvence-doc p.jouvence-synopsis {
+    background-color: #ddd;
+    padding: 1rem; }
+  .jouvence-doc .jouvence-notes {
+    background-color: #593;
+    color: #fff;
+    padding: 1em 0; }
+    .jouvence-doc .jouvence-notes p {
+      padding: 0 2em; }
 
 /*# sourceMappingURL=html_styles.css.map */

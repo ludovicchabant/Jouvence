@@ -1,5 +1,19 @@
 .jouvence-doc {
     font-family: "Courier Prime", "Courier New", Courier, sans-serif;
+    background-color: #fff;
+    color: #111;
+
+    hr {
+        border: none;
+        height: 1px;
+        background: #aaa;
+    }
+
+    .jouvence-main {
+        padding: 2em 0;
+
+        p { padding: 0 2em; }
+    }
 
     h1, .jouvence-title-page-heading {
         text-align: center;
@@ -26,5 +40,23 @@
 
     .jouvence-action-centered {
         text-align: center;
+    }
+
+    p.jouvence-section {
+        background-color: #ccc;
+        padding: 1rem;
+    }
+
+    p.jouvence-synopsis {
+        background-color: #ddd;
+        padding: 1rem;
+    }
+
+    .jouvence-notes {
+        background-color: #593;
+        color: #fff;
+        padding: 1em 0;
+
+        p { padding: 0 2em; }
     }
 }

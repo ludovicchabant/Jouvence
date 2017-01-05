@@ -1,0 +1,5 @@
+---
+in: |
+    = This is a synopsis.
+out:
+    - "+This is a synopsis."

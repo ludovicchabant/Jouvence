@@ -103,6 +103,12 @@ class HtmlDocumentRenderer(BaseDocumentRenderer):
     def write_pagebreak(self, out):
         out.write('<hr/>\n')
 
+    def write_section(self, depth, text, out):
+        _elem(out, 'p', 'section', '%s %s' % ('#' * depth, text))
+
+    def write_synopsis(self, text, out):
+        _elem(out, 'p', 'synopsis', text)
+
     def _render_footnotes(self, out):
         for i, n in enumerate(self.text_renderer.notes):
             note_id = i + 1

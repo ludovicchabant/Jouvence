@@ -78,6 +78,14 @@ class ConsoleDocumentRenderer(BaseDocumentRenderer):
         print("", file=out)
         _w(out, colorama.Style.DIM, 80 * '=')
 
+    def write_section(self, depth, text, out):
+        print("", file=out)
+        _w(out, colorama.Fore.CYAN, '#' * depth + ' ' + text, True)
+
+    def write_synopsis(self, text, out):
+        print("", file=out)
+        _w(out, colorama.Fore.GREEN, '= ' + text, True)
+
 
 class ConsoleTextRenderer(BaseTextRenderer):
     def _writeStyled(self, style, text):

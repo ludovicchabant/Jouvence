@@ -61,3 +61,20 @@ title:
 out:
     - ".EXT. ANOTHER PLACE"
     - "!\nThis is an action I think."
+---
+in: |
+    # ACT I
+
+    = Set up the characters and the story.
+
+    EXT. BRICK'S PATIO - DAY
+
+    = This scene sets up Brick & Steel's new life as retirees.
+
+    A gorgeous day.  The sun is shining.
+out:
+    - "#ACT I"
+    - "+Set up the characters and the story."
+    - ".EXT. BRICK'S PATIO - DAY"
+    - "+This scene sets up Brick & Steel's new life as retirees."
+    - "!\nA gorgeous day.  The sun is shining."

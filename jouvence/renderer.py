@@ -1,7 +1,8 @@
 import re
 from jouvence.document import (
     TYPE_ACTION, TYPE_CENTEREDACTION, TYPE_CHARACTER, TYPE_DIALOG,
-    TYPE_PARENTHETICAL, TYPE_TRANSITION, TYPE_LYRICS, TYPE_PAGEBREAK)
+    TYPE_PARENTHETICAL, TYPE_TRANSITION, TYPE_LYRICS, TYPE_PAGEBREAK,
+    TYPE_SECTION, TYPE_SYNOPSIS)
 
 
 class BaseDocumentRenderer:
@@ -19,6 +20,8 @@ class BaseDocumentRenderer:
             TYPE_TRANSITION: self.write_transition,
             TYPE_LYRICS: self.write_lyrics,
             TYPE_PAGEBREAK: self.write_pagebreak,
+            TYPE_SECTION: self.write_section,
+            TYPE_SYNOPSIS: self.write_synopsis,
         }
 
     def _tr(self, text):
@@ -45,10 +48,12 @@ class BaseDocumentRenderer:
             self.write_scene_heading(scene.header, out)
         for p in scene.paragraphs:
             rdr_func = self._para_rdrs[p.type]
-            if p.type != TYPE_PAGEBREAK:
-                rdr_func(self._tr(p.text), out)
-            else:
+            if p.type == TYPE_PAGEBREAK:
                 rdr_func(out)
+            elif p.type == TYPE_SECTION:
+                rdr_func(p.depth, self._tr(p.text), out)
+            else:
+                rdr_func(self._tr(p.text), out)
 
     def write_header(self, doc, out):
         pass
@@ -84,6 +89,12 @@ class BaseDocumentRenderer:
         raise NotImplementedError()
 
     def write_pagebreak(self, out):
+        raise NotImplementedError()
+
+    def write_section(self, depth, text, out):
+        raise NotImplementedError()
+
+    def write_synopsis(self, text, out):
         raise NotImplementedError()
 
 

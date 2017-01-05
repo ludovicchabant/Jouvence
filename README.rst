@@ -59,7 +59,6 @@ Jouvence doesn't support the complete Fountain syntax yet. The following things
 are not implemented yet:
 
 * Dual dialogue
-* Sections and synopses
 * Proper Unicode support (although Fountain's spec greatly assumes English screenplays, sadly).
 
 

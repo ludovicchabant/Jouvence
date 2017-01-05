@@ -59,6 +59,9 @@ class JouvenceScene:
     def addPageBreak(self):
         self.paragraphs.append(JouvenceSceneElement(TYPE_PAGEBREAK, None))
 
+    def addSection(self, depth, text):
+        self.paragraphs.append(JouvenceSceneSection(depth, text))
+
     def lastParagraph(self):
         try:
             return self.paragraphs[-1]
@@ -77,6 +80,12 @@ class JouvenceSceneElement:
             _ellipsis(self.text, 15))
 
 
+class JouvenceSceneSection(JouvenceSceneElement):
+    def __init__(self, depth, text):
+        super().__init__(TYPE_SECTION, text)
+        self.depth = depth
+
+
 TYPE_ACTION = 0
 TYPE_CENTEREDACTION = 1
 TYPE_CHARACTER = 2
@@ -85,7 +94,8 @@ TYPE_PARENTHETICAL = 4
 TYPE_TRANSITION = 5
 TYPE_LYRICS = 6
 TYPE_PAGEBREAK = 7
-TYPE_EMPTYLINES = 8
+TYPE_SECTION = 8
+TYPE_SYNOPSIS = 9
 
 
 def _scene_element_type_str(t):
@@ -105,8 +115,10 @@ def _scene_element_type_str(t):
         return 'LYRICS'
     if t == TYPE_PAGEBREAK:
         return 'PAGEBREAK'
-    if t == TYPE_EMPTYLINES:
-        return 'EMPTYLINES'
+    if t == TYPE_SECTION:
+        return 'SECTION'
+    if t == TYPE_SYNOPSIS:
+        return 'SYNOPSIS'
     raise NotImplementedError()
 
 
