@@ -1,0 +1,33 @@
+---
+in: |
+    This is something.
+    
+    /*
+    nope
+    nope
+    */
+
+    Ok.
+out:
+    - "!This is something.\n\n\nOk."
+---
+in: |
+    This is something.
+    /*
+    nope
+    nope
+    */
+    OK.
+out:
+    - "!This is something.\nOK."
+---
+in: |
+    /*
+    nope nope
+    */
+    EXT. MANSION
+
+    This is the mansion.
+out:
+    - ".EXT. MANSION"
+    - "!\nThis is the mansion."

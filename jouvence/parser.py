@@ -29,8 +29,9 @@ ANY_STATE = object()
 EOF_STATE = object()
 
 
-RE_EMPTY_LINE = re.compile(r"^$", re.M)
-RE_BLANK_LINE = re.compile(r"^\s*$", re.M)
+# Note how boneyard start/end patterns (/* */) by themselves are
+# considered an empty line.
+RE_EMPTY_LINE = re.compile(r"^(/\*|\*/)?$", re.M)
 
 RE_TITLE_KEY_VALUE = re.compile(r"^(?P<key>[\w\s\-]+)\s*:\s*")
 
@@ -404,6 +405,22 @@ class _ForcedParagraphStates(JouvenceState):
         return self._state_cls()
 
 
+RE_BONEYARD_START = re.compile(r"^/\*", re.M)
+RE_BONEYARD_END = re.compile(r"\*/\s*$", re.M)
+
+
+class _BoneyardState(JouvenceState):
+    def match(self, fp, ctx):
+        return RE_BONEYARD_START.match(fp.peekline())
+
+    def consume(self, fp, ctx):
+        while True:
+            fp.readline()
+            if RE_BONEYARD_END.match(fp.peekline()):
+                break
+        return ANY_STATE
+
+
 class _EmptyLineState(JouvenceState):
     def __init__(self):
         super().__init__()
@@ -413,8 +430,13 @@ class _EmptyLineState(JouvenceState):
         return RE_EMPTY_LINE.match(fp.peekline())
 
     def consume(self, fp, ctx):
-        fp.readline()
-        if fp.line_no > 1:  # Don't take into account the fake blank at 0
+        line = fp.readline()
+        # Increment the number of empty lines to add to the current action,
+        # but:
+        # - don't take into account the fake blank at 0
+        # - don't take into account boneyard endings
+        if (fp.line_no > 1 and
+                not RE_BONEYARD_END.match(line)):
             self.line_count += 1
         return ANY_STATE
 
@@ -435,6 +457,7 @@ ROOT_STATES = [
     _TransitionState,
     _PageBreakState,
     _CenteredActionState,
+    _BoneyardState,
     _EmptyLineState,   # Must be second to last.
     _ActionState,  # Must be last.
 ]
