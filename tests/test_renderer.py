@@ -12,6 +12,9 @@ class TestTextRenderer(BaseTextRenderer):
     def make_underline(self, text):
         return 'U:' + text + ':U'
 
+    def make_note(self, text):
+        return 'N:' + text + ':N'
+
 
 @pytest.mark.parametrize('intext, expected', [
     ("_Underline_", "U:Underline:U"),
@@ -61,4 +64,32 @@ def test_italics(intext, expected):
 def test_bold(intext, expected):
     r = TestTextRenderer()
     out = r.render_text(intext)
+    assert out == expected
+
+
+def test_note():
+    r = TestTextRenderer()
+    out = r.render_text(
+        "This is JACK[[Do we have a better name?]]. He likes movies.")
+    expected = "This is JACKN:Do we have a better name?:N. He likes movies."
+    assert out == expected
+
+
+def test_note_with_line_break():
+    r = TestTextRenderer()
+    out = r.render_text(
+        "This is JACK[[Do we have a better name?\n"
+        "I think we did]]. He likes movies.")
+    expected = ("This is JACKN:Do we have a better name?\n"
+                "I think we did:N. He likes movies.")
+    assert out == expected
+
+
+def test_note_multiple():
+    r = TestTextRenderer()
+    out = r.render_text(
+        "This is JACK[[Do we have a better name?]]. "
+        "He likes movies[[or plays?]].")
+    expected = ("This is JACKN:Do we have a better name?:N. "
+                "He likes moviesN:or plays?:N.")
     assert out == expected

@@ -45,9 +45,17 @@ class HtmlDocumentRenderer(BaseDocumentRenderer):
             }
             out.write(_res('html_header.html') % data)
         out.write('<div class="jouvence-doc">\n')
+        out.write('<div class="jouvence-main">\n')
 
     def write_footer(self, doc, out):
-        out.write('</div>\n')
+        out.write('</div>\n')  # End `jouvence-main`
+
+        out.write('<div class="jouvence-notes">\n')
+        self._render_footnotes(out)
+        out.write('</div>\n')  # End `jouvence-notes`
+
+        out.write('</div>\n')  # End `jouvence-doc`
+
         if self.standalone:
             out.write(_res('html_footer.html'))
 
@@ -95,8 +103,21 @@ class HtmlDocumentRenderer(BaseDocumentRenderer):
     def write_pagebreak(self, out):
         out.write('<hr/>\n')
 
+    def _render_footnotes(self, out):
+        for i, n in enumerate(self.text_renderer.notes):
+            note_id = i + 1
+            out.write(
+                '<div class="jouvence-note" id="jouvence-note-%d">' %
+                note_id)
+            text = '<sup>%d</sup> %s' % (note_id, n)
+            _elem(out, 'p', None, _br(text))
+            out.write('</div>\n')
+
 
 class HtmlTextRenderer(BaseTextRenderer):
+    def __init__(self):
+        self.notes = []
+
     def render_text(self, text):
         return super().render_text(escape(text))
 
@@ -108,3 +129,12 @@ class HtmlTextRenderer(BaseTextRenderer):
 
     def make_underline(self, text):
         return '<u>%s</u>' % text
+
+    def make_note(self, text):
+        note_id = len(self.notes) + 1
+        out = '<sup id="jouvence-note-ref-%d">' % note_id
+        out += '<a rel="footnote" href="#jouvence-note-%d">' % note_id
+        out += str(note_id)
+        out += '</a></sup>'
+        self.notes.append(text)
+        return out

@@ -91,3 +91,9 @@ class ConsoleTextRenderer(BaseTextRenderer):
 
     def make_underline(self, text):
         return self._writeStyled(colorama.Style.BRIGHT, text)
+
+    def make_note(self, text):
+        out = colorama.Style.DIM + colorama.Fore.MAGENTA
+        out += ' [[ ' + text + ' ]] '
+        out += colorama.Style.RESET_ALL
+        return out

@@ -94,6 +94,8 @@ RE_BOLD = re.compile(
 RE_UNDERLINE = re.compile(
     r"(?P<before>^|\s)(?P<esc>\\)?_(?P<text>.*[^\s])_(?=[^a-zA-Z0-9]|$)")
 
+RE_NOTE = re.compile(r"\[\[(?P<text>.+?)\]\]", re.DOTALL)
+
 
 class BaseTextRenderer:
     def render_text(self, text):
@@ -101,6 +103,7 @@ class BaseTextRenderer:
         text = RE_BOLD.sub(self._do_make_bold, text)
         text = RE_ITALICS.sub(self._do_make_italics, text)
         text = RE_UNDERLINE.sub(self._do_make_underline, text)
+        text = RE_NOTE.sub(self._do_make_note, text)
 
         return text
 
@@ -125,6 +128,9 @@ class BaseTextRenderer:
             m.group('before') +
             self.make_underline(m.group('text')))
 
+    def _do_make_note(self, m):
+        return self.make_note(m.group('text'))
+
     def make_italics(self, text):
         raise NotImplementedError()
 
@@ -132,6 +138,9 @@ class BaseTextRenderer:
         raise NotImplementedError()
 
     def make_underline(self, text):
+        raise NotImplementedError()
+
+    def make_note(self, text):
         raise NotImplementedError()
 
 
@@ -143,4 +152,7 @@ class NullTextRenderer(BaseTextRenderer):
         return text
 
     def make_underline(self, text):
+        return text
+
+    def make_note(self, text):
         return text
