@@ -21,24 +21,23 @@ class ConsoleDocumentRenderer(BaseDocumentRenderer):
         colorama.init()
 
     def write_title_page(self, values, out):
-        known = ['title', 'credit', 'author', 'source']
-        center_values = [values.get(i) for i in known
-                         if i is not None]
+        known = ['title', 'credit', 'author', 'authors', 'source']
+        center_values = [values.get(i) for i in known]
 
         print("", file=out)
         for val in center_values:
-            for l in val.split('\n'):
-                print(l.center(self.width), file=out)
+            if val is not None:
+                for l in val.split('\n'):
+                    print(l.center(self.width), file=out)
             print("", file=out)
         print("", file=out)
         print("", file=out)
 
-        ddate = values.get('date') or values.get('draft date')
-        contact = values.get('contact')
-        bottom_lines = [i for i in [ddate, contact]
-                        if i is not None]
+        known = ['date', 'draft date', 'contact', 'copyright']
+        bottom_lines = [values.get(i) for i in known]
 
-        _w(out, colorama.Style.DIM, '\n\n'.join(bottom_lines))
+        _w(out, colorama.Style.DIM, '\n\n'.join([
+            b for b in bottom_lines if b is not None]))
         print("", file=out)
         _w(out, colorama.Style.DIM, 80 * '=')
 
