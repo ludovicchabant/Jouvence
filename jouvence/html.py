@@ -54,9 +54,10 @@ class HtmlDocumentRenderer(BaseDocumentRenderer):
     def write_footer(self, doc, out):
         out.write('</div>\n')  # End `jouvence-main`
 
-        out.write('<div class="jouvence-notes">\n')
-        self._render_footnotes(out)
-        out.write('</div>\n')  # End `jouvence-notes`
+        if self.text_renderer.notes:
+            out.write('<div class="jouvence-notes">\n')
+            self._render_footnotes(out)
+            out.write('</div>\n')  # End `jouvence-notes`
 
         out.write('</div>\n')  # End `jouvence-doc`
 
