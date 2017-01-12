@@ -7,6 +7,7 @@ from jouvence.document import (
 
 class BaseDocumentRenderer:
     def __init__(self, text_renderer=None):
+        self.force_title_page = False
         self.text_renderer = text_renderer
         if not text_renderer:
             self.text_renderer = NullTextRenderer()
@@ -35,6 +36,9 @@ class BaseDocumentRenderer:
         self.write_footer(doc, out)
 
     def render_title_page(self, values, out):
+        if not self.force_title_page and not values:
+            return
+
         clean_values = values.copy()
         clean_values.setdefault('title', 'Untitled Screenplay')
         clean_values.setdefault('credit', 'Written by')
