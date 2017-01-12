@@ -26,6 +26,10 @@ def _res(filename):
         return fp.read()
 
 
+def get_css():
+    return _res('html_styles.css')
+
+
 class HtmlDocumentRenderer(BaseDocumentRenderer):
     def __init__(self, standalone=True):
         super().__init__(HtmlTextRenderer())
