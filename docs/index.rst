@@ -62,3 +62,18 @@ are not implemented:
 * Proper Unicode support (although Fountain's spec greatly assumes English screenplays, sadly).
 
 
+
+Documentation
+=============
+
+.. toctree::
+   :maxdepth: 2
+
+   api
+
+
+If you can't find what you're looking for, have a look here:
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

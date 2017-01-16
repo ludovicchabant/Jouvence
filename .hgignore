@@ -10,3 +10,5 @@ venv
 dist
 Jouvence.egg-info
 jouvence/version.py
+
+docs/_build

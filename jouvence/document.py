@@ -2,11 +2,20 @@ import sys
 
 
 class JouvenceDocument:
+    """Represents a Fountain screenplay in a structured way.
+
+    A screenplay contains:
+
+    * A title page (optional) with a key/value dictionary of settings.
+    * A list of scenes.
+    * Each scene contains a list of paragraphs of various types.
+    """
     def __init__(self):
         self.title_values = {}
         self.scenes = []
 
     def addScene(self, header=None):
+        """Adds a scene with the specified header."""
         s = JouvenceScene()
         if header:
             s.header = header
@@ -14,6 +23,13 @@ class JouvenceDocument:
         return s
 
     def lastScene(self, auto_create=True):
+        """Gets the last scene in the screenplay.
+
+            `auto_create`
+                If ``True``, and the screenplay has no scenes, create
+                a scene with an empty header text. Otherwise, return
+                ``None``.
+        """
         try:
             return self.scenes[-1]
         except IndexError:
@@ -23,6 +39,10 @@ class JouvenceDocument:
             return None
 
     def lastParagraph(self):
+        """Gets the last paragraph of the last scene in the screenplay.
+
+        If there's no scene in the screenplay, return ``None``.
+        """
         s = self.lastScene(False)
         if s:
             return s.lastParagraph()
@@ -30,6 +50,7 @@ class JouvenceDocument:
 
 
 class JouvenceScene:
+    """A scene in a screenplay."""
     def __init__(self):
         self.header = None
         self.paragraphs = []
@@ -57,9 +78,11 @@ class JouvenceScene:
             raise AttributeError
 
     def addPageBreak(self):
+        """Adds a page break (paragraph with ``TYPE_PAGEBREAK`` type)."""
         self.paragraphs.append(JouvenceSceneElement(TYPE_PAGEBREAK, None))
 
     def addSection(self, depth, text):
+        """Adds a section (a :class:`~JouvenceSceneSection` instance)."""
         self.paragraphs.append(JouvenceSceneSection(depth, text))
 
     def lastParagraph(self):
@@ -70,6 +93,9 @@ class JouvenceScene:
 
 
 class JouvenceSceneElement:
+    """An element of a screenplay scene, _e.g._ an action, a dialogue
+    line, a parenthetical, etc.
+    """
     def __init__(self, el_type, text):
         self.type = el_type
         self.text = text

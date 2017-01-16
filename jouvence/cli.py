@@ -3,6 +3,11 @@ import argparse
 
 
 def main():
+    """The Jouvence CLI utility.
+
+    It lets the user print a screenplay to the terminal (with syntax
+    highlighting), or save a screenplay into a nicely formatted HTML page.
+    """
     parser = argparse.ArgumentParser(
         description='Jouvence command line utility')
     parser.add_argument('script')

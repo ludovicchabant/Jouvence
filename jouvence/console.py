@@ -1,3 +1,6 @@
+"""The ``jouvence.console`` module contains utilities for rendering
+a Foutain screenplay in a terminal.
+"""
 import os
 import colorama
 from .renderer import BaseDocumentRenderer, BaseTextRenderer
@@ -15,6 +18,9 @@ def _w(out, style, text, reset_all=False):
 
 
 class ConsoleDocumentRenderer(BaseDocumentRenderer):
+    """A document renderer that prints a screenplay into a terminal with
+    some nice syntax highlighting.
+    """
     def __init__(self, width=80):
         super().__init__(ConsoleTextRenderer())
         self.width = width
@@ -87,6 +93,7 @@ class ConsoleDocumentRenderer(BaseDocumentRenderer):
 
 
 class ConsoleTextRenderer(BaseTextRenderer):
+    """A text renderer for producing ANSI colouring."""
     def _writeStyled(self, style, text):
         return style + text + colorama.Style.NORMAL
 

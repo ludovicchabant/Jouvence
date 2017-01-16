@@ -1,3 +1,7 @@
+"""The ``jouvence.html`` module contains utilities for turning a
+Fountain screenplay into a web page, along with other web-related
+features.
+"""
 import os.path
 from markupsafe import escape
 from .renderer import BaseDocumentRenderer, BaseTextRenderer
@@ -27,15 +31,32 @@ def _res(filename):
 
 
 def get_css():
+    """Gets the default CSS screenplay theme that Jouvence uses."""
     return _res('html_styles.css')
 
 
 class HtmlDocumentRenderer(BaseDocumentRenderer):
+    """A document renderer that formats a screenplay into a web page.
+    """
     def __init__(self, standalone=True):
+        """Creates a new HTML renderer.
+
+            `standalone`
+                If ``True`` (the default), it will render a complete HTML
+                page, with CSS styling. If ``False``, it will just produce
+                the markup for the screenplay itself. The calling
+                application is responsible for producing the rest of the
+                HTML page, along with CSS code, to render the screenplay
+                properly.
+        """
         super().__init__(HtmlTextRenderer())
         self.standalone = standalone
 
     def get_css(self):
+        """Gets the default CSS screenplay theme that Jouvence uses.
+
+        This is the same as :func:`~jouvence.html.get_css`.
+        """
         return _res('html_styles.css')
 
     def write_header(self, doc, out):
@@ -126,6 +147,7 @@ class HtmlDocumentRenderer(BaseDocumentRenderer):
 
 
 class HtmlTextRenderer(BaseTextRenderer):
+    """A text renderer for producing HTML markup."""
     def __init__(self):
         self.notes = []
 

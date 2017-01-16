@@ -645,10 +645,17 @@ class _JouvenceStateMachine:
 
 
 class JouvenceParser:
+    """ Parses a Fountain document and returns a
+    :class:`~jouvence.document.JouvenceDocument` instance.
+    """
     def __init__(self):
         pass
 
     def parse(self, filein):
+        """Parses a file or stream. This must either be a Python file object,
+        or the path to file on disk. Returns a
+        :class:`~jouvence.document.JouvenceDocument` instance.
+        """
         if isinstance(filein, str):
             with open(filein, 'r') as fp:
                 return self._doParse(fp)
@@ -656,6 +663,9 @@ class JouvenceParser:
             return self._doParse(fp)
 
     def parseString(self, text):
+        """Parses a string. Returns a
+        :class:`~jouvence.document.JouvenceDocument` instance.
+        """
         import io
         with io.StringIO(text) as fp:
             return self._doParse(fp)

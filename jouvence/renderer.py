@@ -6,7 +6,18 @@ from jouvence.document import (
 
 
 class BaseDocumentRenderer:
+    """The base class for document renderers.
+
+    Document renderers are given a document to transform into whatever
+    format they're responsible for.
+    """
     def __init__(self, text_renderer=None):
+        """Initializes the document renderer.
+
+            `text_renderer`
+                The :class:`~BaseTextRenderer` instance to use for
+                formatting text.
+        """
         self.force_title_page = False
         self.text_renderer = text_renderer
         if not text_renderer:
@@ -29,6 +40,13 @@ class BaseDocumentRenderer:
         return self.text_renderer.render_text(text)
 
     def render_doc(self, doc, out):
+        """Renders the given document (``doc``) into the given buffer
+        (``out``).
+
+        The output buffer must be a file-like object, like the return
+        value of the ``open()`` built-in function, or an instance of
+        ``io.StringIO``, among others.
+        """
         self.write_header(doc, out)
         self.render_title_page(doc.title_values, out)
         for s in doc.scenes:
@@ -113,7 +131,11 @@ RE_NOTE = re.compile(r"\[\[(?P<text>.+?)\]\]", re.DOTALL)
 
 
 class BaseTextRenderer:
+    """A class responsible for rendering text, including such things as
+    italics, bold, or underline.
+    """
     def render_text(self, text):
+        """Processes the given text, and returns the formatted data."""
         # Replace bold stuff to catch double asterisks.
         text = RE_BOLD.sub(self._do_make_bold, text)
         text = RE_ITALICS.sub(self._do_make_italics, text)
