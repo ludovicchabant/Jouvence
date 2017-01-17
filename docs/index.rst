@@ -8,7 +8,11 @@ Jouvence supports:
 * Most of the Fountain specification (see limitations below).
 * Rendering to HTML and terminals.
 
+The code is available on `BitBucket`_ and `GitHub`_.
+
 .. _fountain: http://fountain.io/
+.. _bitbucket: https://bitbucket.org/ludovicchabant/jouvence
+.. _github: https://github.com/ludovicchabant/Jouvence
 
 
 Quickstart
