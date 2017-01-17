@@ -1,11 +1,7 @@
 
-########
-JOUVENCE
-########
+.. image:: _static/jouvence.jpg
 
-
-`Fountain`_ is a plain text markup language for screenwriting. Jouvence
-is a Python package for parsing and rendering Fountain documents.
+Jouvence is a Python package for parsing and rendering `Fountain`_ documents.
 
 Jouvence supports:
 
@@ -15,8 +11,11 @@ Jouvence supports:
 .. _fountain: http://fountain.io/
 
 
+Quickstart
+==========
+
 Installation
-============
+------------
 
 As with many Python packages, it's recommended that you use `virtualenv`_,
 but since Jouvence doesn't have many dependencies, you should be fine.
@@ -37,7 +36,7 @@ styles.
 
 
 Usage
-=====
+-----
 
 The Jouvence API goes pretty much like this::
 
@@ -53,7 +52,7 @@ The Jouvence API goes pretty much like this::
 
 
 Limitations
-===========
+-----------
 
 Jouvence doesn't support the complete Fountain syntax yet. The following things
 are not implemented:
