@@ -42,3 +42,11 @@ in: |
 out:
     - ".somewhere in space"
     - "!\nWe are in space!"
+---
+in: |
+    EXT. OLYMPIA CIRCUS - NIGHT
+    
+    ...where the second-rate carnival is parked for the moment in an Alabama field.
+out:
+    - ".EXT. OLYMPIA CIRCUS - NIGHT"
+    - "!\n...where the second-rate carnival is parked for the moment in an Alabama field."

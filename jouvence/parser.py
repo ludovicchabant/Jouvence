@@ -388,6 +388,10 @@ class _ForcedParagraphStates(JouvenceState):
             # really some centered text.
             if symbol == '>' and RE_CENTERED_LINE.match(lines[1]):
                 return False
+            # Special case: don't force a scene header if it's an action
+            # text that starts with, say, an ellipsis.
+            if symbol == '.' and len(lines[1]) > 1 and not lines[1][1].isalnum():
+                return False
 
             self._state_cls = self.STATE_SYMBOLS[symbol]
 
