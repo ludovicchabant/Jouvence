@@ -13,4 +13,5 @@ tasks:
         py.test
     - package: |
         cd Jouvence
+        python3.6 -m pip install setuptools
         python setup.py sdist bdist_wheel
