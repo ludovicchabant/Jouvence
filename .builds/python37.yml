@@ -14,4 +14,4 @@ tasks:
     - package: |
         cd Jouvence
         python3.7 -m pip install setuptools
-        python setup.py sdist bdist_wheel
+        python3.7 setup.py sdist bdist_wheel
