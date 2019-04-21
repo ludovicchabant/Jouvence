@@ -1,0 +1,16 @@
+image: ubuntu/bionic
+packages:
+    - python3.6
+    - python3-pip
+tasks:
+    - install: |
+        cd Jouvence
+        python3.6 -m pip install -e .
+        python3.6 -m pip install -r dev-requirements.txt
+    - test: |
+        export PATH="~/.local/bin:$PATH"
+        cd Jouvence
+        py.test
+    - package: |
+        cd Jouvence
+        python setup.py sdist bdist_wheel
