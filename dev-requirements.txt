@@ -1,5 +1,4 @@
-py==1.4.32
-pytest==3.0.5
-PyYAML==3.12
-Sphinx==1.5.1
-sphinx-autobuild==0.6.0
+pytest>=4.4.1
+PyYAML>=5.1
+Sphinx>=2.0.1
+sphinx-autobuild>=0.7.1
