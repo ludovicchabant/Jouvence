@@ -25,7 +25,7 @@ class TestTextRenderer(BaseTextRenderer):
     ("This is _two underlined_ words.", "This is U:two underlined:U words."),
     ("This is _three underlined words_.",
      "This is U:three underlined words:U."),
-    ("This is an \_escaped_ one.", "This is an _escaped_ one.")
+    ("This is an \\_escaped_ one.", "This is an _escaped_ one.")
 ])
 def test_underline(intext, expected):
     r = TestTextRenderer()
@@ -42,7 +42,7 @@ def test_underline(intext, expected):
     ("This is *two italics* words.", "This is I:two italics:I words."),
     ("This is *three italics words*.",
      "This is I:three italics words:I."),
-    ("This is some \*escaped* one.", "This is some *escaped* one.")
+    ("This is some \\*escaped* one.", "This is some *escaped* one.")
 ])
 def test_italics(intext, expected):
     r = TestTextRenderer()
@@ -59,7 +59,7 @@ def test_italics(intext, expected):
     ("This is **two bold** words.", "This is B:two bold:B words."),
     ("This is **three bold words**.",
      "This is B:three bold words:B."),
-    ("This is some \**escaped** one.", "This is some **escaped** one.")
+    ("This is some \\**escaped** one.", "This is some **escaped** one.")
 ])
 def test_bold(intext, expected):
     r = TestTextRenderer()
