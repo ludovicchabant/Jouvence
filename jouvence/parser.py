@@ -194,9 +194,12 @@ class _CenteredActionState(JouvenceState):
                 # The whole paragraph must have `>` and `<` wrappers, so
                 # if we detect a line that doesn't have them, we make this
                 # paragraph be a normal action instead.
-                fp.restore(snapshot)
-                self._aborted = True
-                return _ActionState()
+                if len(clean_line) != 0:
+                    fp.restore(snapshot)
+                    self._aborted = True
+                    return _ActionState()
+                # else: We do make an exception for a line of spaces, since
+                # those are easy to leave behind while writing.
             else:
                 # Remove wrapping `>`/`<`, and spaces.
                 clean_line = clean_line[1:-1].strip()

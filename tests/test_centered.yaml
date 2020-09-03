@@ -1,0 +1,13 @@
+---
+in: ">**THE END**<"
+out:
+    - '!><**THE END**'
+---
+in: ">**THE END**<\n\n"
+out:
+    - '!><**THE END**'
+    - '!'
+---
+in: ">**THE END**<\n    \n"
+out:
+    - "!><**THE END**\n"
