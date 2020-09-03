@@ -138,7 +138,7 @@ class _ActionState(JouvenceState):
 
             if is_first_line:
                 # Ignore the fake blank line at 0 if it's threre.
-                if fp.line_no == 0:
+                if fp.last_read_line_no == 0:
                     continue
 
                 line = line.lstrip('!')  # In case it was forced.
@@ -190,7 +190,7 @@ class _CenteredActionState(JouvenceState):
             eol = line[len(clean_line):]
 
             clean_line = clean_line.strip()
-            if clean_line[0] != '>' or clean_line[-1] != '<':
+            if len(clean_line) < 2 or clean_line[0] != '>' or clean_line[-1] != '<':
                 # The whole paragraph must have `>` and `<` wrappers, so
                 # if we detect a line that doesn't have them, we make this
                 # paragraph be a normal action instead.
@@ -478,7 +478,7 @@ class _EmptyLineState(JouvenceState):
         # but:
         # - don't take into account the fake blank at 0
         # - don't take into account boneyard endings
-        if (fp.line_no > 1 and
+        if (fp.last_read_line_no > 0 and
                 not RE_BONEYARD_END.match(line)):
             self.line_count += 1
         return ANY_STATE
@@ -510,21 +510,21 @@ ROOT_STATES = [
 
 class _PeekableFile:
     def __init__(self, fp):
-        self.line_no = 1
+        self.last_read_line_no = 0
         self._fp = fp
         # This is for adding a "fake" blank line at the beginning of the
-        # file, to help with match things on the first line.
+        # file, to help with matching things on the first line.
         # (has blank line, is blank line unread)
         self._blankAt0 = (False, False)
 
     def readline(self):
         if self._blankAt0[1]:
             self._blankAt0 = (True, False)
-            self.line_no = 0
+            self.last_read_line_no = 0
             return '\n'
 
         data = self._fp.readline()
-        self.line_no += 1
+        self.last_read_line_no += 1
         return data
 
     def peekline(self):
@@ -548,28 +548,28 @@ class _PeekableFile:
         return lines
 
     def snapshot(self):
-        return (self._fp.tell(), self._blankAt0, self.line_no)
+        return (self._fp.tell(), self._blankAt0, self.last_read_line_no)
 
     def restore(self, snapshot):
         self._fp.seek(snapshot[0])
         self._blankAt0 = snapshot[1]
-        self.line_no = snapshot[2]
+        self.last_read_line_no = snapshot[2]
 
     def reset(self):
         self._fp.seek(0)
         if self._blankAt0[0]:
             self._blankAt0 = (True, True)
-            self.line_no = 0
+            self.last_read_line_no = -1
         else:
             self._blankAt0 = (False, False)
-            self.line_no = 1
+            self.last_read_line_no = 0
 
     def _addBlankAt0(self):
         if self._fp.tell() != 0:
             raise Exception(
                 "Can't add blank line at 0 if reading has started.")
         self._blankAt0 = (True, True)
-        self.line_no = 0
+        self.last_read_line_no = -1
 
 
 class _JouvenceStateMachine:
@@ -580,7 +580,7 @@ class _JouvenceStateMachine:
 
     @property
     def line_no(self):
-        return self.fp.line_no
+        return self.fp.last_read_line_no
 
     def run(self):
         try:
