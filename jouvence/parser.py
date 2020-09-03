@@ -583,6 +583,14 @@ class _JouvenceStateMachine:
         return self.fp.line_no
 
     def run(self):
+        try:
+            self._doRun()
+        except JouvenceParserError:
+            raise
+        except Exception as ex:
+            raise JouvenceParserError(self.line_no, str(ex)) from ex
+
+    def _doRun(self):
         # Start parsing! Here we try to do a mostly-forward-only parser with
         # non overlapping regexes to make it decently fast.
         self.state = _TitlePageState()

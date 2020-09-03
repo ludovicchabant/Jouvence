@@ -16,7 +16,11 @@ def main():
 
     from jouvence.parser import JouvenceParser
     p = JouvenceParser()
-    doc = p.parse(args.script)
+    try:
+        doc = p.parse(args.script)
+    except Exception as ex:
+        print(ex)
+        return 1
 
     if not args.out_file:
         from jouvence.console import ConsoleDocumentRenderer
